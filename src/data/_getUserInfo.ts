@@ -1,15 +1,13 @@
 import axios from "axios";
 import { hmb } from "../gen/proto";
 
-import $protobuf from "protobufjs/light";
-
 const proto = hmb.protobuf;
 
-export async function getUsrInfo(): Promise<hmb.protobuf.UserInfoResponse> {
-  const s = new proto.UserInfoRequest();
+export async function getUsrInfo(): Promise<hmb.protobuf.ExampleUserInfoResponse> {
+  const s = new proto.ExampleUserInfoRequest();
   s.userId = 10086;
   // getUserInfo.UserInfoRequest.create(s)
-  const writer = proto.UserInfoRequest.encode(s);
+  const writer = proto.ExampleUserInfoRequest.encode(s);
   console.log(s);
   const uint8Array = writer.finish();
   console.log(uint8Array);
@@ -27,27 +25,17 @@ export async function getUsrInfo(): Promise<hmb.protobuf.UserInfoResponse> {
     responseType: "arraybuffer"
   });
 
-  const a = $protobuf.roots["default"];
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const pb = a.hmb.protobuf;
-  console.log("bbbb", pb);
-  const arrayBuffer = new ArrayBuffer(uint8Array.length);
-  const req = new Uint8Array(arrayBuffer);
-  for (let i = 0; i < uint8Array.length; i++) {
-    req[i] = uint8Array[i];
-  }
-  console.log(arrayBuffer);
+  const req = Uint8Array.from(uint8Array);
   console.log(req);
 
   return httpService
-    .post("http://127.0.0.1:9988/getUserInfo", req, {})
+    .post("http://127.0.0.1:9988/example/getUserInfo", req, {})
     .then(r => {
       console.log(r.status);
       console.log(r.data);
       const buffer = new Uint8Array(r.data);
       console.log("buffer", buffer);
-      return proto.UserInfoResponse.decode(buffer);
+      return proto.ExampleUserInfoResponse.decode(buffer);
     })
     .catch(reason => {
       console.log(reason);
