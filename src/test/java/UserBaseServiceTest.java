@@ -17,8 +17,8 @@ public class UserBaseServiceTest {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             URI uri = new URI("http", null, "127.0.0.1", 9988, "/getUserInfo", "", null);
             HttpPost post = new HttpPost(uri);
-            User.UserInfoRequest.Builder builder = User.UserInfoRequest.newBuilder();
-            builder.setUserId(10086L);
+            User.ExampleUserInfoRequest.Builder builder = User.ExampleUserInfoRequest.newBuilder();
+            builder.setUserId(10086);
             post.setEntity(new ByteArrayEntity(builder.build().toByteArray()));
             post.setHeader("Content-Type", "application/x-protobuf");
             HttpResponse response = httpClient.execute(post);
@@ -26,7 +26,7 @@ public class UserBaseServiceTest {
             System.out.println("\n\n\n\n");
             if (code == 200) {
                 InputStream content = response.getEntity().getContent();
-                User.UserInfoResponse result = User.UserInfoResponse.parseFrom(content);
+                User.ExampleUserInfoResponse result = User.ExampleUserInfoResponse.parseFrom(content);
                 System.out.println("\n\n\nresult\n:" + result.toString());
             } else {
                 System.err.println(code);
