@@ -1,6 +1,43 @@
 syntax = "proto3";
 package hmb.protobuf;
 
+
+//=============================== ⬇  ATN  ⬇ ===============================
+
+message AtnNode{
+  string id = 1;  // 为了方便以及减少出错，约定id为stateNumber
+  string name = 2;
+  int32 x = 3;
+  int32 y = 4;
+  bool fixed = 5;
+}
+
+message AtnLink {
+  string source = 2;  // node可能重名，下标好麻烦，因此使用唯一标识stateNumber
+  string target = 3;  // node可能重名，下标好麻烦，因此使用唯一标识stateNumber
+}
+
+message SubAugmentedTransitionNetwork {
+  repeated AtnNode atnNode = 1;  // data
+  repeated AtnLink atnLink = 2;  // links
+}
+
+message AugmentedTransitionNetworks {
+  repeated SubAugmentedTransitionNetwork subATN = 2;
+}
+
+message InitialState {
+  AugmentedTransitionNetworks lexerATN = 1;
+  AugmentedTransitionNetworks parserATN = 2;
+}
+
+//=============================== ⬆  ATN  ⬆ ===============================
+
+
+
+
+
+
 //=============================== ⬇ lexer ⬇ ===============================
 
 message LexerState{
