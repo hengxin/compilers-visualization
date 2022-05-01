@@ -41,25 +41,41 @@ public class AtnPrinter {
 
             Set<Transition> visitedTransitionSet = new HashSet<>();
 
-            Set<ATNState> addedAtnNode = new HashSet<>();  // 用于展示
+            Map<ATNState, Set<ATNState>> sourceToTarget = new HashMap<>();
+            Map<ATNState, Set<ATNState>> targetToSource = new HashMap<>();
+            List<Triple> tripleList = new ArrayList<>();
 
             while (!atnStateList.isEmpty()) {
                 final ATNState currentState = atnStateList.removeFirst();
                 // map ruleStartState to RULE_START_STATE, 用于展示
                 final ATNState source = ruleStartState.equals(currentState) ? RULE_START_STATE : currentState;
 
-                List<Triple> tripleList = new ArrayList<>();
                 for (final Transition transition : currentState.getTransitions()) {
                     final ATNState nextState = getOrDefault(merged, Antlr4Utils.nextATNState(transition));
+                    final ATNState target = ruleStartState.equals(nextState) ? RULE_START_STATE : nextState;
                     if (!visitedTransitionSet.contains(transition)) {
-                        tripleList.add(new Triple(source, transition, ruleStartState.equals(nextState) ? RULE_START_STATE : nextState));
+                        sourceToTarget.putIfAbsent(source, new HashSet<>());
+                        sourceToTarget.get(source).add(target);
+                        targetToSource.putIfAbsent(target, new HashSet<>());
+                        targetToSource.get(target).add(source);
+                        tripleList.add(new Triple(source, transition, target));
                         visitedTransitionSet.add(transition);
                         if (!nextState.equals(ruleStopState)) {
                             atnStateList.add(nextState);
                         }
                     }
                 }
+            }
 
+            {
+                for (Triple triple1 : tripleList) {
+                    if (triple1.first().equals(triple1.second())) {
+                        throw new RuntimeException("self loop");
+                    }
+                }
+
+
+                Set<ATNState> addedAtnNode = new HashSet<>();  // 用于展示
 
                 for (Triple triple : tripleList) {
                     Transition transition = triple.transition();
@@ -71,32 +87,38 @@ public class AtnPrinter {
                         case null -> throw new RuntimeException("transition");
                     };
 
+
+                    // 如果 A--t1-->B, B--t2-->A，则这两段都需要弯曲
+                    final boolean isLoop = sourceToTarget.getOrDefault(triple.second(), Collections.emptySet()).contains(triple.first());
+
                     if (addedAtnNode.add(triple.first())) {
-                        subAtnBuilder.addAtnNode(
+                        subAtnBuilder.addData(
                                 AtnNode.newBuilder()
                                         .setId(String.valueOf(triple.first().stateNumber))
                                         .setName(triple.first().toString())
-                                        .setX(triple.first().equals(RULE_START_STATE) ? 300 : -1)
-                                        .setY(triple.first().equals(RULE_START_STATE) ? 300 : -1)
+                                        .setX(triple.first().equals(RULE_START_STATE) ? 0 : 500)
+                                        .setY(triple.first().equals(RULE_START_STATE) ? 700 : 600)
                                         .setFixed(triple.first().equals(RULE_START_STATE))
                                         .build());
                     }
 
                     if (addedAtnNode.add(triple.second())) {
-                        subAtnBuilder.addAtnNode(
+                        subAtnBuilder.addData(
                                 AtnNode.newBuilder()
                                         .setId(String.valueOf(triple.second().stateNumber))
                                         .setName(triple.second().toString())
-                                        .setX(triple.second().equals(ruleStopState) ? 800 : -1)
-                                        .setY(triple.second().equals(ruleStopState) ? 300 : -1)
+                                        .setX(triple.second().equals(ruleStopState) ? 1000 : 500)
+                                        .setY(triple.second().equals(ruleStopState) ? 700 : 600)
                                         .setFixed(triple.second().equals(ruleStopState))
                                         .build());
                     }
 
-                    subAtnBuilder.addAtnLink(
+                    subAtnBuilder.addLinks(
                             AtnLink.newBuilder()
                                     .setSource(String.valueOf(triple.first().stateNumber))
                                     .setTarget(String.valueOf(triple.second().stateNumber))
+                                    .setLabel(Label.newBuilder().setShow(true).setFormatter(transitionString).build())
+                                    .setLineStyle(LineStyle.newBuilder().setCurveness(isLoop ? 0.2 : 0).build())
                                     .build()
                     );
                     System.out.println(triple.first() + " --    " + transitionString + "    --> " + triple.second());
