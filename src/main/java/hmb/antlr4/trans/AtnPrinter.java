@@ -99,6 +99,7 @@ public class AtnPrinter {
                                         .setX(triple.first().equals(RULE_START_STATE) ? 0 : 500)
                                         .setY(triple.first().equals(RULE_START_STATE) ? 700 : 600)
                                         .setFixed(triple.first().equals(RULE_START_STATE))
+                                        .setItemStyle(ItemStyle.newBuilder().build())
                                         .build());
                     }
 
@@ -110,6 +111,7 @@ public class AtnPrinter {
                                         .setX(triple.second().equals(ruleStopState) ? 1000 : 500)
                                         .setY(triple.second().equals(ruleStopState) ? 700 : 600)
                                         .setFixed(triple.second().equals(ruleStopState))
+                                        .setItemStyle(ItemStyle.newBuilder().build())
                                         .build());
                     }
 
