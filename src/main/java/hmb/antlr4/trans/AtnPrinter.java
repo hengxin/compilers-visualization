@@ -120,7 +120,7 @@ public class AtnPrinter {
                                     .setSource(String.valueOf(triple.first().stateNumber))
                                     .setTarget(String.valueOf(triple.second().stateNumber))
                                     .setLabel(Label.newBuilder().setShow(true).setFormatter(transitionString).build())
-                                    .setLineStyle(LineStyle.newBuilder().setCurveness(isLoop ? 0.2 : 0).build())
+                                    .setLineStyle(LineStyle.newBuilder().build())
                                     .build()
                     );
                     System.out.println(triple.first() + " --    " + transitionString + "    --> " + triple.second());
