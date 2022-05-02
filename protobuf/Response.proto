@@ -1,25 +1,41 @@
-syntax = "proto3";
+syntax = "proto2";
 package hmb.protobuf;
 
 
 //=============================== ⬇  ATN  ⬇ ===============================
 
-message AtnNode{
-  string id = 1;  // 为了方便以及减少出错，约定id为stateNumber
-  string name = 2;
-  int32 x = 3;
-  int32 y = 4;
-  bool fixed = 5;
+message ItemStyle {
+  optional string color = 1 [default = 'rgb(0,0,255)'];
+}
+
+message AtnNode {
+  required string id = 1;  // 为了方便以及减少出错，约定id为stateNumber
+  required string name = 2;
+  required int32 x = 3;
+  required int32 y = 4;
+  required bool fixed = 5; // default false
+  required ItemStyle itemStyle = 6;
+}
+
+message Label {
+  required bool show = 1 [default = true]; // always true
+  required string formatter = 2; // string of line
+}
+
+message LineStyle {
+  optional double curveness = 1 [default = 0];
 }
 
 message AtnLink {
-  string source = 2;  // node可能重名，下标好麻烦，因此使用唯一标识stateNumber
-  string target = 3;  // node可能重名，下标好麻烦，因此使用唯一标识stateNumber
+  required string source = 2;  // node可能重名，下标好麻烦，因此使用唯一标识stateNumber
+  required string target = 3;  // node可能重名，下标好麻烦，因此使用唯一标识stateNumber
+  required Label label = 4;
+  required LineStyle lineStyle =5;
 }
 
 message SubAugmentedTransitionNetwork {
-  repeated AtnNode atnNode = 1;  // data
-  repeated AtnLink atnLink = 2;  // links
+  repeated AtnNode data = 1;  // atnNode
+  repeated AtnLink links = 2;  // atnLink
 }
 
 message AugmentedTransitionNetworks {
@@ -27,8 +43,8 @@ message AugmentedTransitionNetworks {
 }
 
 message InitialState {
-  AugmentedTransitionNetworks lexerATN = 1;
-  AugmentedTransitionNetworks parserATN = 2;
+  required AugmentedTransitionNetworks lexerATN = 1;
+  required AugmentedTransitionNetworks parserATN = 2;
 }
 
 //=============================== ⬆  ATN  ⬆ ===============================
@@ -57,12 +73,12 @@ message LexerResult {
 //=============================== ⬇ parser ⬇ ===============================
 
 message TreeNode{
-  string name = 1;
+  required string name = 1;
   repeated TreeNode children = 2;
 }
 
 message ParserState{
-  TreeNode root = 1;
+  required TreeNode root = 1;
 }
 
 message ParserResult {
