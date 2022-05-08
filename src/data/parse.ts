@@ -2,6 +2,7 @@ import axios from "axios";
 import { hmb } from "../gen/proto";
 
 const proto = hmb.protobuf;
+let myInitState: hmb.protobuf.IInitialState | null = null;
 
 async function _parse(
   data: hmb.protobuf.MainRequest
@@ -22,25 +23,39 @@ async function _parse(
     });
 }
 
-export default function parse(
+export async function parse(
   userId: number,
   name: string,
   lexer: string,
   parser: string,
   code: string
-): void {
+): Promise<boolean | void> {
   const r = new proto.MainRequest();
   r.userId = userId;
   r.name = name;
   r.lexer = lexer;
   r.parser = parser;
   r.code = code;
-  _parse(r)
+  return _parse(r)
     .then(resp => {
       if (!resp.success) {
         alert(resp.errorMessage);
+        return false;
       }
       console.log(resp);
+      if (!resp.initialState) {
+        alert("resp.initialState = " + resp.initialState);
+        return false;
+      }
+      myInitState = resp.initialState;
+      return true;
     })
-    .catch();
+    .catch(e => {
+      console.log(e);
+      return false;
+    });
+}
+
+export function getInitState(): hmb.protobuf.IInitialState | null {
+  return myInitState;
 }

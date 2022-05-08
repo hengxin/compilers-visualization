@@ -2,11 +2,24 @@
   <div style="padding-left: 10px; padding-right: 10px">
     <a-input-group compact>
       <a-input
-        v-model:value="name"
+        v-model:value="grammarName"
         placeholder="grammar name"
         style="width: 30%"
       />
-      <a-button type="primary" @click="ok">ok</a-button>
+      <a-button type="primary" @click="ok">开始解析</a-button>
+      <a-button
+        type="default"
+        @click="
+          () => {
+            this.grammarName = '';
+            this.lexer = '';
+            this.parser = '';
+            this.code = '';
+          }
+        "
+        danger
+        >clear</a-button
+      >
     </a-input-group>
     <br />
     <a-row>
@@ -31,9 +44,9 @@
 </template>
 
 <script>
-import { Button, Row, Col, Input, InputGroup, Textarea } from "ant-design-vue";
-import { mapState, mapMutations } from "vuex";
-import parse from "../data/parse";
+import { Button, Col, Input, InputGroup, Row, Textarea } from "ant-design-vue";
+import { mapMutations, mapState } from "vuex";
+import { parse } from "@/data/parse";
 
 export default {
   name: "TextInput",
@@ -47,7 +60,7 @@ export default {
   },
   data() {
     return {
-      name: "Cmm",
+      grammarName: "Cmm",
       lexer:
         "lexer grammar CmmLexer;\n" +
         "\n" +
@@ -156,11 +169,15 @@ export default {
     ok() {
       this.setUserId(0);
       const userId = this.userId;
-      const name = this.name;
+      const grammarName = this.grammarName;
       const lexer = this.lexer;
       const parser = this.parser;
       const code = this.code;
-      parse(userId, name, lexer, parser, code);
+      parse(userId, grammarName, lexer, parser, code).then(s => {
+        if (s) {
+          this.$router.push("all");
+        }
+      });
     }
   }
 };
