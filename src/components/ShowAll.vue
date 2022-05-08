@@ -3,14 +3,16 @@
 </template>
 
 <script>
-import { getInitState } from "@/data/parse";
+import { loaded, getInitState } from "@/data/show_all";
 
 export default {
   name: "ShowAll",
   mounted() {
-    if (!getInitState()) {
+    if (!loaded()) {
       alert("unloaded");
       this.$router.push("input");
+    } else {
+      console.log(getInitState());
     }
   }
 };

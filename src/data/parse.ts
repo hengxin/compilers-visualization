@@ -1,8 +1,8 @@
 import axios from "axios";
 import { hmb } from "../gen/proto";
+import setMainResponse from "./show_all";
 
 const proto = hmb.protobuf;
-let myInitState: hmb.protobuf.IInitialState | null = null;
 
 async function _parse(
   data: hmb.protobuf.MainRequest
@@ -43,19 +43,10 @@ export async function parse(
         return false;
       }
       console.log(resp);
-      if (!resp.initialState) {
-        alert("resp.initialState = " + resp.initialState);
-        return false;
-      }
-      myInitState = resp.initialState;
-      return true;
+      return setMainResponse(resp);
     })
     .catch(e => {
       console.log(e);
       return false;
     });
-}
-
-export function getInitState(): hmb.protobuf.IInitialState | null {
-  return myInitState;
 }
