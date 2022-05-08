@@ -1,6 +1,7 @@
 import axios from "axios";
 import { hmb } from "../gen/proto";
 import setMainResponse from "./show_all";
+import { message } from "ant-design-vue";
 import proto = hmb.protobuf;
 
 async function _parse(data: proto.MainRequest): Promise<proto.MainResponse> {
@@ -33,17 +34,17 @@ export async function parse(
   r.lexer = lexer;
   r.parser = parser;
   r.code = code;
-  return _parse(r)
-    .then(resp => {
-      if (!resp.success) {
-        alert(resp.errorMessage);
-        return false;
-      }
-      console.log(resp);
-      return setMainResponse(resp);
-    })
-    .catch(e => {
-      console.log(e);
+  return _parse(r).then(resp => {
+    if (!resp.success) {
+      message.error(resp.errorMessage);
+      console.log(resp.errorMessage);
       return false;
-    });
+    }
+    console.log(resp);
+    if (setMainResponse(resp)) {
+      return true;
+    } else {
+      throw "parse error";
+    }
+  });
 }

@@ -6,7 +6,7 @@ let myInitState: proto.IInitialState;
 
 export default function setMainResponse(resp: proto.MainResponse): boolean {
   if (!resp.initialState) {
-    alert("resp.initialState = " + resp.initialState);
+    console.log("resp.initialState = " + resp.initialState);
     return false;
   }
   myInitState = resp.initialState;

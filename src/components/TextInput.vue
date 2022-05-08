@@ -44,7 +44,15 @@
 </template>
 
 <script>
-import { Button, Col, Input, InputGroup, Row, Textarea } from "ant-design-vue";
+import {
+  Button,
+  Col,
+  Input,
+  InputGroup,
+  message,
+  Row,
+  Textarea
+} from "ant-design-vue";
 import { mapMutations, mapState } from "vuex";
 import { parse } from "@/data/parse";
 import { showAll } from "@/router";
@@ -174,11 +182,16 @@ export default {
       const lexer = this.lexer;
       const parser = this.parser;
       const code = this.code;
-      parse(userId, grammarName, lexer, parser, code).then(s => {
-        if (s) {
-          showAll();
-        }
-      });
+      parse(userId, grammarName, lexer, parser, code)
+        .then(s => {
+          if (s) {
+            showAll();
+          }
+        })
+        .catch(e => {
+          message.warn("Uncaught Error");
+          throw e;
+        });
     }
   }
 };
