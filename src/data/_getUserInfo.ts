@@ -1,9 +1,8 @@
 import axios from "axios";
 import { hmb } from "../gen/proto";
+import proto = hmb.protobuf;
 
-const proto = hmb.protobuf;
-
-export async function getUsrInfo(): Promise<hmb.protobuf.ExampleUserInfoResponse> {
+export async function getUsrInfo(): Promise<proto.ExampleUserInfoResponse> {
   const s = new proto.ExampleUserInfoRequest();
   s.userId = 10086;
   // getUserInfo.UserInfoRequest.create(s)

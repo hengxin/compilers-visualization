@@ -1,14 +1,13 @@
 import axios from "axios";
 import { hmb } from "../gen/proto";
-
-const proto = hmb.protobuf;
+import proto = hmb.protobuf;
 
 let onload = false,
   loaded = false;
 let index = -1;
-let list: hmb.protobuf.IParserState[] = [];
+let list: proto.IParserState[] = [];
 
-async function _getList(): Promise<hmb.protobuf.IParserState[]> {
+async function _getList(): Promise<proto.IParserState[]> {
   const httpService = axios.create({
     method: "get",
     headers: {

@@ -1,12 +1,9 @@
 import axios from "axios";
 import { hmb } from "../gen/proto";
 import setMainResponse from "./show_all";
+import proto = hmb.protobuf;
 
-const proto = hmb.protobuf;
-
-async function _parse(
-  data: hmb.protobuf.MainRequest
-): Promise<hmb.protobuf.MainResponse> {
+async function _parse(data: proto.MainRequest): Promise<proto.MainResponse> {
   const httpService = axios.create({
     method: "post",
     headers: {
