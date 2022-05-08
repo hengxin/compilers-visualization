@@ -13,27 +13,27 @@ public class ObjectManager<T> implements Closeable {
     private final T thisObject;
 
     @SuppressWarnings("unchecked")
-    private ObjectManager(ReloadClassLoader classLoader, String packageName, Class<?>[] parameterTypes, Object... initArgs) {
+    private ObjectManager(ReloadClassLoader classLoader, String fullClassName, Class<?>[] parameterTypes, Object... initArgs) {
         this.classLoader = classLoader;
         try {
-            thisClass = (Class<T>) classLoader.loadClass(packageName);
+            thisClass = (Class<T>) classLoader.loadClass(fullClassName);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
         thisObject = ClassLoaderUtils.newInstance(thisClass, parameterTypes, initArgs);
     }
 
-    public ObjectManager(URL url, String packageName, Class<?>[] parameterTypes, Object... initArgs) {
+    public ObjectManager(URL url, String fullClassName, Class<?>[] parameterTypes, Object... initArgs) {
         this(new ReloadClassLoader("reload " + url.toString(), new URL[]{url}, ClassLoader.getSystemClassLoader()),
-                packageName,
+                fullClassName,
                 parameterTypes,
                 initArgs);
         shouldClose = true;
     }
 
-    public ObjectManager(ObjectManager<?> objectManager, String packageName, Class<?>[] parameterTypes, Object... initArgs) {
+    public ObjectManager(ObjectManager<?> objectManager, String fullClassName, Class<?>[] parameterTypes, Object... initArgs) {
         this(objectManager.classLoader,
-                packageName,
+                fullClassName,
                 parameterTypes,
                 initArgs);
     }
