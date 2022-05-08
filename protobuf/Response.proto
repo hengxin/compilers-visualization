@@ -86,3 +86,10 @@ message ParserResult {
 }
 
 //=============================== ⬆ parser ⬆ ===============================
+
+
+message MainResponse {
+  required bool success = 1;
+  optional InitialState initialState = 2;
+  optional string errorMessage = 3;
+}

@@ -4,6 +4,9 @@
     <router-link to="/hello">HelloWorld</router-link>
   </p>
   <p>
+    <router-link to="/input">InputGrammarAndCode</router-link>
+  </p>
+  <p>
     <router-link to="/parser">Parser</router-link>
   </p>
   <p>
@@ -13,7 +16,8 @@
 
 <script>
 export default {
-  name: "HomePage"
+  name: "HomePage",
+  components: {}
 };
 </script>
 
