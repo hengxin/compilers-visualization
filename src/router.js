@@ -7,7 +7,7 @@ const routes = [
   { path: "/parser", component: () => import("./components/ShowParser.vue") },
   { path: "/tree", component: () => import("./components/EchartsTree") },
   { path: "/demo", component: () => import("./_demo/Demo") },
-  { path: "/all", component: () => import("./components/ShowAll") },
+  { path: "/show", component: () => import("./components/ShowAll") },
 
   // Final
   {
@@ -22,3 +22,7 @@ const myRouter = createRouter({
 });
 
 export default myRouter;
+
+export function showAll() {
+  return myRouter.push("show");
+}

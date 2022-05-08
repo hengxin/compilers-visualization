@@ -47,6 +47,7 @@
 import { Button, Col, Input, InputGroup, Row, Textarea } from "ant-design-vue";
 import { mapMutations, mapState } from "vuex";
 import { parse } from "@/data/parse";
+import { showAll } from "@/router";
 
 export default {
   name: "TextInput",
@@ -175,7 +176,7 @@ export default {
       const code = this.code;
       parse(userId, grammarName, lexer, parser, code).then(s => {
         if (s) {
-          this.$router.push("all");
+          showAll();
         }
       });
     }
