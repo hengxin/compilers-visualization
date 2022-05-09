@@ -20,10 +20,11 @@ message AtnNode {
 message Label {
   required bool show = 1 [default = true]; // always true
   required string formatter = 2; // string of line
+  required int32 lineHeight = 3 [default = -10]; // always -10
 }
 
 message LineStyle {
-  optional double curveness = 1 [default = 0];
+  optional double curveness = 1 [default = 0];  // 前端已经全局设置 autoCurveness: true
 }
 
 message AtnLink {
@@ -34,8 +35,9 @@ message AtnLink {
 }
 
 message SubAugmentedTransitionNetwork {
-  repeated AtnNode data = 1;  // atnNode
-  repeated AtnLink links = 2;  // atnLink
+  repeated AtnNode graphNode = 1;  // atnNode, data
+  repeated AtnLink graphEdge = 2;  // atnLink, links
+  required string ruleName = 3;
 }
 
 message AugmentedTransitionNetworks {

@@ -92,7 +92,7 @@ public class AtnPrinter {
                     final boolean isLoop = sourceToTarget.getOrDefault(triple.second(), Collections.emptySet()).contains(triple.first());
 
                     if (addedAtnNode.add(triple.first())) {
-                        subAtnBuilder.addData(
+                        subAtnBuilder.addGraphNode(
                                 AtnNode.newBuilder()
                                         .setId(String.valueOf(triple.first().stateNumber))
                                         .setName(triple.first().toString())
@@ -104,7 +104,7 @@ public class AtnPrinter {
                     }
 
                     if (addedAtnNode.add(triple.second())) {
-                        subAtnBuilder.addData(
+                        subAtnBuilder.addGraphNode(
                                 AtnNode.newBuilder()
                                         .setId(String.valueOf(triple.second().stateNumber))
                                         .setName(triple.second().toString())
@@ -115,11 +115,15 @@ public class AtnPrinter {
                                         .build());
                     }
 
-                    subAtnBuilder.addLinks(
+                    subAtnBuilder.addGraphEdge(
                             AtnLink.newBuilder()
                                     .setSource(String.valueOf(triple.first().stateNumber))
                                     .setTarget(String.valueOf(triple.second().stateNumber))
-                                    .setLabel(Label.newBuilder().setShow(true).setFormatter(transitionString).build())
+                                    .setLabel(Label.newBuilder()
+                                            .setShow(Label.getDefaultInstance().getShow())
+                                            .setFormatter(transitionString)
+                                            .setLineHeight(Label.getDefaultInstance().getLineHeight())
+                                            .build())
                                     .setLineStyle(LineStyle.newBuilder().build())
                                     .build()
                     );
@@ -127,7 +131,7 @@ public class AtnPrinter {
                 }
             }
 
-            atnBuilder.addSubATN(subAtnBuilder.build());
+            atnBuilder.addSubATN(subAtnBuilder.setRuleName(recognizer.getRuleNames()[ruleStartState.ruleIndex]).build());
 
             System.out.println();
             System.out.println("\n+===============================================================================+\n");
