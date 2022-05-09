@@ -19,6 +19,6 @@ module.exports = {
     }
   },
   chainWebpack: config => {
-    config.entry("app").clear().add("./src/main.js");
+    config.entry("app").clear().add("./src/main.ts");
   }
 };
