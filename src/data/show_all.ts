@@ -42,7 +42,7 @@ const globalConstOption = {
       force: {
         repulsion: 4000,
         edgeLength: [30, 50],
-        layoutAnimation: true,
+        layoutAnimation: false,
         // friction: 1,
         gravity: 0.2
       }
