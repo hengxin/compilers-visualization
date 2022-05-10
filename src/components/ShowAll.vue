@@ -1,12 +1,12 @@
 <template>
   <a-button @click="back">back</a-button>
   <a-button @click="debug">debug</a-button>
-  <a-col :span="11">
+  <a-col :span="9">
     <a-card v-for="(op, idx) in optionList" :key="idx" ref="vAtnList">
       <v-chart
         class="chart"
         :option="op"
-        style="height: 300%; width: 100%"
+        style="height: 90%; width: 100%"
       ></v-chart>
     </a-card>
   </a-col>
@@ -63,9 +63,4 @@ export default {
   }
 };
 </script>
-<style scoped>
-.chart {
-  width: 100%;
-  height: 100%;
-}
-</style>
+<style scoped></style>

@@ -20,7 +20,7 @@ const globalConstOption = {
     {
       type: "graph",
       layout: "force",
-      symbolSize: 25,
+      symbolSize: 13,
       animation: false,
       draggable: true,
       roam: true,
@@ -28,9 +28,9 @@ const globalConstOption = {
         show: true
       },
       edgeSymbol: ["circle", "arrow"],
-      edgeSymbolSize: [4, 10],
+      edgeSymbolSize: [3, 4],
       edgeLabel: {
-        fontSize: 12
+        fontSize: 8
       },
       data: [],
       links: [],
@@ -40,11 +40,11 @@ const globalConstOption = {
       },
       autoCurveness: true,
       force: {
-        repulsion: 4000,
-        edgeLength: [30, 50],
+        repulsion: 2000,
+        edgeLength: [50, 100],
         layoutAnimation: false,
         // friction: 1,
-        gravity: 0.2
+        gravity: 0.4
       }
     }
   ]

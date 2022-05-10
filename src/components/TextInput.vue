@@ -148,9 +148,9 @@ export default {
         "  tokenVocab=CmmLexer;\n" +
         "}\n" +
         "\n" +
-        "program: statement*  ( LC statement* RC )* ;\n" +
+        "program: stmt+ ;\n" +
         "\n" +
-        "statement:\n" +
+        "stmt:\n" +
         "    expr1 SEMI |\n" +
         "    expr2 SEMI |\n" +
         "    expr3 SEMI ;\n" +
@@ -161,12 +161,10 @@ export default {
         "\n" +
         "expr2:\n" +
         "    FLOAT |\n" +
-        "    LP expr2 RP RP;\n" +
+        "    LP expr2 RP;\n" +
         "\n" +
         "expr3:\n" +
-        "    LP* ID RP* ;\n" +
-        "\n" +
-        "expr4: expr4 PLUS expr4 |expr4 STAR expr4| ID | FLOAT;",
+        "    LP* ID RP* ;\n",
       code: ""
     };
   },
