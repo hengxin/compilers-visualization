@@ -21,6 +21,6 @@ public final class WildcardTransition extends Transition {
 
 	@Override
 	public String toString() {
-		return ".";
+		return "WildcardTransition.";
 	}
 }

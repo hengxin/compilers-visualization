@@ -163,14 +163,15 @@ public class DFAState {
 	@Override
 	public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append(stateNumber).append(":").append(configs);
+		//stateNumber 是 DFA[] 中的下标
+        buf.append("state(").append(stateNumber).append("):").append(configs);
         if ( isAcceptState ) {
-            buf.append("=>");
+            buf.append("_AC");
             if ( predicates!=null ) {
                 buf.append(Arrays.toString(predicates));
             }
             else {
-                buf.append(prediction);
+                buf.append('(').append(prediction).append(')');
             }
         }
 		return buf.toString();

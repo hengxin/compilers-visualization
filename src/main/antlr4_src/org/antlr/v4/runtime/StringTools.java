@@ -11,4 +11,12 @@ public class StringTools {
         s = s.replace("\t","\\t");
         return s;
     }
+    public static String replace(int i) {
+        return switch (i) {
+            case '\n' -> "\\n";
+            case '\t' -> "\\t";
+            case '\r' -> "\\r";
+            default -> String.valueOf((char) i);
+        };
+    }
 }

@@ -470,7 +470,7 @@ public class IntervalSet implements IntSet {
 	}
 
 	@Override
-	public String toString() { return toString(false); }
+	public String toString() { return toString(true); }
 
 	public String toString(boolean elemAreChar) {
 		StringBuilder buf = new StringBuilder();
@@ -487,8 +487,26 @@ public class IntervalSet implements IntSet {
 			int b = I.b;
 			if ( a==b ) {
 				if ( a==Token.EOF ) buf.append("<EOF>");
+				else if (a == '\n') buf.append("\"\\n\"");
+				else if (a == '\r') buf.append("\"\\r\"");
+				else if (a == '\t') buf.append("\"\\t\"");
 				else if ( elemAreChar ) buf.append("'").appendCodePoint(a).append("'");
 				else buf.append(a);
+			}
+			else if (b - a == 1 ) {
+				if ( a==Token.EOF ) buf.append("<EOF>");
+				else if (a == '\n') buf.append("\"\\n\"");
+				else if (a == '\r') buf.append("\"\\r\"");
+				else if (a == '\t') buf.append("\"\\t\"");
+				else if ( elemAreChar ) buf.append("'").appendCodePoint(a).append("'");
+				else buf.append(a);
+				buf.append(", ");
+				if ( b==Token.EOF ) buf.append("<EOF>");
+				else if (b == '\n') buf.append("\"\\n\"");
+				else if (b == '\r') buf.append("\"\\r\"");
+				else if (b == '\t') buf.append("\"\\t\"");
+				else if ( elemAreChar ) buf.append("'").appendCodePoint(b).append("'");
+				else buf.append(b);
 			}
 			else {
 				if ( elemAreChar ) buf.append("'").appendCodePoint(a).append("'..'").appendCodePoint(b).append("'");

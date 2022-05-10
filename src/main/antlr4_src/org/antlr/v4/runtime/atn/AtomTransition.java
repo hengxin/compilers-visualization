@@ -34,6 +34,6 @@ public final class AtomTransition extends Transition {
 
 	@Override
 	public String toString() {
-		return String.valueOf(label);
+		return "'"+ (char) label +"'";
 	}
 }

@@ -374,6 +374,7 @@ public class DefaultErrorStrategy implements ANTLRErrorStrategy {
 		IntervalSet expecting = getExpectedTokens(recognizer);
 		String msg = "extraneous input "+tokenName+" expecting "+
 			expecting.toString(recognizer.getVocabulary());
+		// ????
 		recognizer.notifyErrorListeners(t, msg, null);
 	}
 

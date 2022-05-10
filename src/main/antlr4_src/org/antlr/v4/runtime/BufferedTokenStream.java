@@ -104,7 +104,10 @@ public class BufferedTokenStream implements TokenStream {
     @Override
     public void seek(int index) {
         lazyInit();
-        p = adjustSeekIndex(index);
+        index = adjustSeekIndex(index);
+		if (index != p) {
+			p = index;
+		}
     }
 
     @Override
@@ -203,7 +206,7 @@ public class BufferedTokenStream implements TokenStream {
 	}
 
 	@Override
-	public int LA(int i) { return LT(i).getType(); }
+	public int LA(int i) { return LT(i).getType(); }//
 
     protected Token LB(int k) {
         if ( (p-k)<0 ) return null;

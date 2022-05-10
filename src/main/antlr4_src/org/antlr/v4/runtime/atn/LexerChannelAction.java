@@ -88,6 +88,9 @@ public final class LexerChannelAction implements LexerAction {
 
 	@Override
 	public String toString() {
-		return String.format("channel(%d)", channel);
+		if (channel == Token.HIDDEN_CHANNEL) {
+			return "push to channel(HIDDEN)";
+		}
+		return String.format("push to channel(%d)", channel);
 	}
 }

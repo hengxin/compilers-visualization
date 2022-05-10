@@ -47,6 +47,6 @@ public final class EpsilonTransition extends Transition {
 	@Override
 
 	public String toString() {
-		return "epsilon";
+		return "ε";
 	}
 }

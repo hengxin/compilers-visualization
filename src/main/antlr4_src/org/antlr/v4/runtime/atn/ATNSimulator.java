@@ -8,10 +8,12 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public abstract class ATNSimulator {
 	/**
@@ -22,6 +24,49 @@ public abstract class ATNSimulator {
 	static {
 		SERIALIZED_VERSION = ATNDeserializer.SERIALIZED_VERSION;
 	}
+
+	private Consumer<DFAState> startStateClosureListener = null;
+	public void setStartStateClosureListener(Consumer<DFAState> listener) {
+		this.startStateClosureListener = listener;
+	}
+	protected void listenStateClosureListener(DFAState dfaState) {
+		if (startStateClosureListener != null) {
+			startStateClosureListener.accept(dfaState);;
+		}
+	}
+
+	private Consumer<DFAState> addNewDFAStateListener = null;
+	public void setAddNewDFAStateListener(Consumer<DFAState> listener) {
+		this.addNewDFAStateListener = listener;
+	}
+	protected void listenAddNewDFAState(DFAState dfaState) {
+		if (addNewDFAStateListener != null) {
+			addNewDFAStateListener.accept(dfaState);
+		}
+	}
+
+	private TriConsumer<DFAState, DFAState, Integer> addNewEdgeListener = null;
+	public void setAddNewEdgeListener(TriConsumer<DFAState, DFAState, Integer> listener) {
+		this.addNewEdgeListener = listener;
+	}
+	protected void listenAddNewEdge(DFAState from, DFAState to, int upon) {
+		if (addNewEdgeListener != null) {
+			addNewEdgeListener.accept(from, to, upon);
+		}
+	}
+
+	private TriConsumer<DFAState, DFAState, Integer> reuseStateListener = null;
+	public void setReuseStateListener(TriConsumer<DFAState, DFAState, Integer> listener) {
+		this.reuseStateListener = listener;
+	}
+	protected void listenReuseState(DFAState from, DFAState to, int upon) {
+		if (reuseStateListener != null) {
+			reuseStateListener.accept(from, to, upon);
+		}
+	}
+
+
+
 
 	/**
 	 * This is the current serialized UUID.

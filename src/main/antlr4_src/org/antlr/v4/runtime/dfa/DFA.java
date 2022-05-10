@@ -40,7 +40,7 @@ public class DFA {
 	 * {@code true} if this DFA is for a precedence decision; otherwise,
 	 * {@code false}. This is the backing field for {@link #isPrecedenceDfa}.
 	 */
-	private final boolean precedenceDfa;
+	private final boolean precedenceDfa;  //  instanceof StarLoopEntryState && isPrecedenceDecision
 
 	public DFA(DecisionState atnStartState) {
 		this(atnStartState, 0);

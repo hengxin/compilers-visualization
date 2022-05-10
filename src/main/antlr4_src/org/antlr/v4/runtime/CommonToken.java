@@ -53,6 +53,11 @@ public class CommonToken implements WritableToken, Serializable {
 
 	protected Pair<TokenSource, CharStream> source;
 
+	public void clearSource() {
+		this.text = (getText());
+		source = EMPTY_SOURCE;
+	}
+
 	/**
 	 * This is the backing field for {@link #getText} when the token text is
 	 * explicitly set in the constructor or via {@link #setText}.

@@ -30,9 +30,9 @@ public abstract class Transition {
 	// constants for serialization
 	public static final int EPSILON			= 1;
 	public static final int RANGE			= 2;
-	public static final int RULE			= 3;
+	public static final int RULE			= 3; // 子规则
 	public static final int PREDICATE		= 4; // e.g., {isType(input.LT(1))}?
-	public static final int ATOM			= 5;
+	public static final int ATOM			= 5; // 终结符
 	public static final int ACTION			= 6;
 	public static final int SET				= 7; // ~(A|B) or ~atom, wildcard, which convert to next 2
 	public static final int NOT_SET			= 8;
@@ -71,7 +71,7 @@ public abstract class Transition {
 
 	/** The target of this transition. */
 
-	public ATNState target;
+	public /*final*/ ATNState target;  //
 
 	protected Transition(ATNState target) {
 		if (target == null) {

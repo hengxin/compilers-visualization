@@ -191,7 +191,7 @@ import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
  *
  * <p>
  * The {@link ParserATNSimulator} locks on the {@link #decisionToDFA} field when
- * it adds a new DFA object to that array. {@link #addDFAEdge}
+ * it adds a new DFA object to that array. {@link #addStateAndDFAEdge}
  * locks on the DFA for the current decision when setting the
  * {@link DFAState#edges} field. {@link #addDFAState} locks on
  * the DFA for the current decision when looking up a DFA state to see if it
@@ -209,7 +209,7 @@ import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
  * targets. The DFA simulator will either find {@link DFAState#edges} to be
  * {@code null}, to be non-{@code null} and {@code dfa.edges[t]} null, or
  * {@code dfa.edges[t]} to be non-null. The
- * {@link #addDFAEdge} method could be racing to set the field
+ * {@link #addStateAndDFAEdge} method could be racing to set the field
  * but in either case the DFA simulator works; if {@code null}, and requests ATN
  * simulation. It could also race trying to get {@code dfa.edges[t]}, but either
  * way it will work because it's not doing a test and set operation.</p>
@@ -264,10 +264,12 @@ import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
  * the input.</p>
  */
 public class ParserATNSimulator extends ATNSimulator {
-	public static final boolean debug = false;
-	public static final boolean debug_list_atn_decisions = false;
-	public static final boolean dfa_debug = false;
-	public static final boolean retry_debug = false;
+	public static final boolean debug = true;
+	public static final boolean debug_list_atn_decisions = true;
+	public static final boolean dfa_debug = true;
+	public static final boolean retry_debug = true;
+	public static final boolean testing_debug = false;
+	public static final boolean closure_debug = false;
 
 	/** Just in case this optimization is bad, add an ENV variable to turn it off */
 	public static final boolean TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT = Boolean.parseBoolean(getSafeEnv("TURN_OFF_LR_LOOP_ENTRY_BRANCH_OPT"));
@@ -330,9 +332,11 @@ public class ParserATNSimulator extends ATNSimulator {
 							   ParserRuleContext outerContext)
 	{
 		if ( debug || debug_list_atn_decisions )  {
-			System.out.println("adaptivePredict decision "+decision+
+			System.out.println("=========================================\n\nadaptivePredict decision "+decision+
 								   " exec LA(1)=="+ getLookaheadName(input)+
-								   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine());
+								   " line "+input.LT(1).getLine()+":"+input.LT(1).getCharPositionInLine()+
+					               " index("+input.LT(1).getTokenIndex()+")"
+			);
 		}
 
 		_input = input;
@@ -361,9 +365,10 @@ public class ParserATNSimulator extends ATNSimulator {
 			if (s0 == null) {
 				if ( outerContext ==null ) outerContext = ParserRuleContext.EMPTY;
 				if ( debug || debug_list_atn_decisions )  {
-					System.out.println("predictATN decision "+ dfa.decision+
-									   " exec LA(1)=="+ getLookaheadName(input) +
-									   ", outerContext="+ outerContext.toString(parser));
+					System.out.println("s0 is null");
+//					System.out.println("predictATN decision "+ dfa.decision+
+//									   " exec LA(1)=="+ getLookaheadName(input) +
+//									   ", outerContext="+ outerContext.toString(parser));
 				}
 
 				boolean fullCtx = false;
@@ -379,7 +384,10 @@ public class ParserATNSimulator extends ATNSimulator {
 					 * appropriate start state for the precedence level rather
 					 * than simply setting DFA.s0.
 					 */
+
+					// 太粗暴了？？？
 					dfa.s0.configs = s0_closure; // not used for prediction but useful to know start configs anyway
+
 					s0_closure = applyPrecedenceFilter(s0_closure);
 					s0 = addDFAState(dfa, new DFAState(s0_closure));
 					dfa.setPrecedenceStartState(parser.getPrecedence(), s0);
@@ -388,10 +396,13 @@ public class ParserATNSimulator extends ATNSimulator {
 					s0 = addDFAState(dfa, new DFAState(s0_closure));
 					dfa.s0 = s0;
 				}
+				// dfa.add(new DFA-State)
+			} else {
+				if ( debug ) System.out.println("s0 is not null ");
 			}
 
 			int alt = execATN(dfa, s0, input, index, outerContext);
-			if ( debug ) System.out.println("DFA after predictATN: "+ dfa.toString(parser.getVocabulary()));
+			if ( debug ) System.out.println("  DFA (hash="+System.identityHashCode(dfa)+") after predictATN: \n"+ dfa.toString(parser.getVocabulary()));
 			return alt;
 		}
 		finally {
@@ -455,6 +466,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 
 			if (D == ERROR) {
+				// 无路可走了
 				// if any configs in previous dipped into outer context, that
 				// means that input up to t actually finished entry rule
 				// at least for SLL decision. Full LL doesn't dip into outer
@@ -557,7 +569,15 @@ public class ParserATNSimulator extends ATNSimulator {
 			return null;
 		}
 
-		return edges[t + 1];
+		DFAState target = edges[t + 1];
+		if (target != null) {
+			listenReuseState(previousD, target, t);
+		}
+		if (debug && target != null) {
+			System.out.println("Reuse state "+previousD.stateNumber+
+					" edge to "+target.stateNumber + " upon " + getTokenName(t));
+		}
+		return target;
 	}
 
 	/**
@@ -575,26 +595,29 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected DFAState computeTargetState(DFA dfa, DFAState previousD, int t) {
 		ATNConfigSet reach = computeReachSet(previousD.configs, t, false);
 		if ( reach==null ) {
-			addDFAEdge(dfa, previousD, t, ERROR);
+			addStateAndDFAEdge(dfa, previousD, t, ERROR);
 			return ERROR;
 		}
 
+		// 还有路可走
 		// create new target state; we'll add to DFA after it's complete
 		DFAState D = new DFAState(reach);
 
 		int predictedAlt = getUniqueAlt(reach);
+		// 如果非唯一，返回 ATN.INVALID_ALT_NUMBER
 
 		if ( debug ) {
+			//？？？？
 			Collection<BitSet> altSubSets = PredictionMode.getConflictingAltSubsets(reach);
-			System.out.println("SLL altSubSets="+altSubSets+
-							   ", configs="+reach+
-							   ", predict="+predictedAlt+", allSubsetsConflict="+
-								   PredictionMode.allSubsetsConflict(altSubSets)+", conflictingAlts="+
-							   getConflictingAlts(reach));
+//			System.out.println("SLL altSubSets="+altSubSets+
+//							   ", configs="+reach+
+//							   ", predict="+predictedAlt+", allSubsetsConflict="+
+//								   PredictionMode.allSubsetsConflict(altSubSets)+", conflictingAlts="+
+//							   getConflictingAlts(reach));
 		}
 
 		if ( predictedAlt!=ATN.INVALID_ALT_NUMBER ) {
-			// NO CONFLICT, UNIQUELY PREDICTED ALT
+			// NO CONFLICT, UNIQUELY PREDICTED ALT，唯一
 			D.isAcceptState = true;
 			D.configs.uniqueAlt = predictedAlt;
 			D.prediction = predictedAlt;
@@ -616,7 +639,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		// all adds to dfa are done after we've created full D state
-		D = addDFAEdge(dfa, previousD, t, D);
+		D = addStateAndDFAEdge(dfa, previousD, t, D);
 		return D;
 	}
 
@@ -769,6 +792,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
 										   boolean fullCtx)
 	{
+		listenStateClosureListener(new DFAState(closure));
 		if ( debug )
 			System.out.println("in computeReachSet, starting closure: " + closure);
 
@@ -792,7 +816,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		// First figure out where we can reach on input t
 		for (ATNConfig c : closure) {
-			if ( debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
+			if ( testing_debug ) System.out.println("testing "+getTokenName(t)+" at "+c.toString());
 
 			if (c.state instanceof RuleStopState) {
 				assert c.context.isEmpty();
@@ -1451,6 +1475,8 @@ public class ParserATNSimulator extends ATNSimulator {
 		assert !fullCtx || !configs.dipsIntoOuterContext;
 	}
 
+
+	// 这算是真正的closure
 	protected void closureCheckingStopState(ATNConfig config,
 											ATNConfigSet configs,
 											Set<ATNConfig> closureBusy,
@@ -1459,7 +1485,7 @@ public class ParserATNSimulator extends ATNSimulator {
 											int depth,
 											boolean treatEofAsEpsilon)
 	{
-		if ( debug ) System.out.println("closure("+config.toString(parser,true)+")");
+		if ( closure_debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
 		if ( config.state instanceof RuleStopState ) {
 			// We hit rule end. If we have context info, use it
@@ -2062,22 +2088,29 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * otherwise this method returns the result of calling {@link #addDFAState}
 	 * on {@code to}
 	 */
-	protected DFAState addDFAEdge(DFA dfa,
-								  DFAState from,
-								  int t,
-								  DFAState to)
+	// return "to"
+	protected DFAState addStateAndDFAEdge(DFA dfa,
+										  DFAState from,
+										  int t,
+										  DFAState to)
 	{
-		if ( debug ) {
-			System.out.println("EDGE "+from+" -> "+to+" upon "+getTokenName(t));
-		}
 
 		if (to == null) {
 			return null;
 		}
 
+		// dfa.state.add(to -> to)
 		to = addDFAState(dfa, to); // used existing if possible not incoming
+		// 实际上，to没有变化
+
+		// 先加state
 		if (from == null || t < -1 || t > atn.maxTokenType) {
 			return to;
+		}
+
+		listenAddNewEdge(from, to, t);
+		if ( debug ) {
+			System.out.println("ADD_EDGE   "+from+"   -->   "+to+" upon "+getTokenName(t));
 		}
 
 		synchronized (from) {
@@ -2089,7 +2122,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		if ( debug ) {
-			System.out.println("DFA=\n"+dfa.toString(parser!=null?parser.getVocabulary():VocabularyImpl.EMPTY_VOCABULARY));
+			System.out.println("DFA (hash "+System.identityHashCode(dfa)+") =\n"+dfa.toString(parser!=null?parser.getVocabulary():VocabularyImpl.EMPTY_VOCABULARY));
 		}
 
 		return to;
@@ -2110,6 +2143,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	 * state if {@code D} is already in the DFA, or {@code D} itself if the
 	 * state was not already present.
 	 */
+	// dfa.state.add(D->D)
 	protected DFAState addDFAState(DFA dfa, DFAState D) {
 		if (D == ERROR) {
 			return D;
@@ -2125,7 +2159,10 @@ public class ParserATNSimulator extends ATNSimulator {
 				D.configs.setReadonly(true);
 			}
 			dfa.states.put(D, D);
+
+			this.listenAddNewDFAState(D);
 			if ( debug ) System.out.println("adding new DFA state: "+D);
+
 			return D;
 		}
 	}

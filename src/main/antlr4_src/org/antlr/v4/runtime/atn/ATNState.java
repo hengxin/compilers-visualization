@@ -80,7 +80,7 @@ public abstract class ATNState {
 	// constants for serialization
 	public static final int INVALID_TYPE = 0;
 	public static final int BASIC = 1;
-	public static final int RULE_START = 2;
+	public static final int RULE_START = 2;//子网络
 	public static final int BLOCK_START = 3;
 	public static final int PLUS_BLOCK_START = 4;
 	public static final int STAR_BLOCK_START = 5;
@@ -147,7 +147,7 @@ public abstract class ATNState {
 	}
 
 	public Transition[] getTransitions() {
-		return transitions.toArray(new Transition[transitions.size()]);
+		return transitions.toArray(new Transition[0]);
 	}
 
 	public int getNumberOfTransitions() {

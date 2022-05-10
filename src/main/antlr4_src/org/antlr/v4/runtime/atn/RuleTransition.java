@@ -51,4 +51,9 @@ public final class RuleTransition extends Transition {
 	public boolean matches(int symbol, int minVocabSymbol, int maxVocabSymbol) {
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return "RuleTransition{" + (ruleIndex) + "}";
+	}
 }

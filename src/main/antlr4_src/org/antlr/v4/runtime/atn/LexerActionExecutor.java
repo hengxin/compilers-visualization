@@ -176,6 +176,11 @@ public class LexerActionExecutor {
 	}
 
 	@Override
+	public String toString() {
+		return "lexerActions=" + Arrays.toString(lexerActions);
+	}
+
+	@Override
 	public int hashCode() {
 		return this.hashCode;
 	}

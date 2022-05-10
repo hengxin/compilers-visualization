@@ -35,11 +35,22 @@ import java.util.WeakHashMap;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
+
+	public void select (String s) {
+		String s1 = this.getExpectedTokens().toString(getVocabulary());
+		String s2 = this.getExpectedTokensWithinCurrentRule().toString(getVocabulary());
+		System.out.println("SELECT " + s + "!!!");
+	}
 	public class TraceListener implements ParseTreeListener {
 		@Override
 		public void enterEveryRule(ParserRuleContext ctx) {
+			String s1 = Parser.this.getExpectedTokens().toString(Parser.this.getVocabulary());
+			String s2 = getExpectedTokens().toString(getVocabulary());
+			Token LT1 = _input.LT(1);
+			String text = LT1.getText();
+			int index = LT1.getTokenIndex();
 			System.out.println("enter   " + getRuleNames()[ctx.getRuleIndex()] +
-							   ", LT(1)=" + _input.LT(1).getText());
+							   ", LT(1)=" + text + " index(" + index + ")");
 		}
 
 		@Override
@@ -54,8 +65,11 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 
 		@Override
 		public void exitEveryRule(ParserRuleContext ctx) {
+			Token LT1 = _input.LT(1);
+			String text = LT1.getText();
+			int index = LT1.getTokenIndex();
 			System.out.println("exit    "+getRuleNames()[ctx.getRuleIndex()]+
-							   ", LT(1)="+_input.LT(1).getText());
+								", LT(1)=" + text + " index(" + index + ")");
 		}
 	}
 
@@ -135,7 +149,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	 * implemented as a parser listener so this field is not directly used by
 	 * other parser methods.
 	 */
-	private TraceListener _tracer;
+	public TraceListener _tracer;
 
 	/**
 	 * The list of {@link ParseTreeListener} listeners registered to receive
@@ -298,7 +312,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 
 	/**
 	 * @return {@code true} if the {@link ParserRuleContext#children} list is trimmed
-	 * using the default {@link Parser.TrimToSizeListener} during the parse process.
+	 * using the default {@link TrimToSizeListener} during the parse process.
 	 */
 	public boolean getTrimParseTree() {
 		return getParseListeners().contains(TrimToSizeListener.INSTANCE);
@@ -568,11 +582,13 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	public Token consume() {
 		Token o = getCurrentToken();
 		if (o.getType() != EOF) {
+			System.out.print("consume: ");
 			getInputStream().consume();
 		}
 		boolean hasListener = _parseListeners != null && !_parseListeners.isEmpty();
 		if (_buildParseTrees || hasListener) {
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
+				System.out.println("mode=SKIP");
 				ErrorNode node = _ctx.addErrorNode(createErrorNode(_ctx,o));
 				if (_parseListeners != null) {
 					for (ParseTreeListener listener : _parseListeners) {
@@ -581,14 +597,17 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 				}
 			}
 			else {
+				System.out.println("mode = consume ");
 				TerminalNode node = _ctx.addChild(createTerminalNode(_ctx,o));
 				if (_parseListeners != null) {
 					for (ParseTreeListener listener : _parseListeners) {
+						// inner class
 						listener.visitTerminal(node);
 					}
 				}
 			}
 		}
+		else System.out.println("MODE = ERROR");
 		return o;
 	}
 
@@ -655,6 +674,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 				parent.addChild(localctx);
 			}
 		}
+		// buildTree
 		_ctx = localctx;
 	}
 
