@@ -20,7 +20,7 @@ message AtnNode {
 message Label {
   required bool show = 1 [default = true]; // always true
   required string formatter = 2; // string of line
-  required int32 lineHeight = 3 [default = -10]; // always -10
+  required int32 lineHeight = 3 [default = -20]; // always -20
 }
 
 message LineStyle {
