@@ -1,5 +1,6 @@
 package hmb.spring.serviceimpl;
 
+import hmb.antlr4.trans.AtnCreator;
 import hmb.protobuf.Request.*;
 import hmb.protobuf.Response.*;
 import hmb.spring.config.MyServiceException;
@@ -18,8 +19,6 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-
-import static hmb.antlr4.trans.AtnPrinter.Print;
 
 
 @Service
@@ -132,8 +131,10 @@ public class ParseService {
             // lexer与parser加载完毕
 
             parser.get().setTrace(true);
-            var lexerATN = Print(lexer.get());
-            var parserATN = Print(parser.get(), lexer.get().getVocabulary());
+            var lexerAtnCreator = new AtnCreator(lexer.get());
+            var parserAtnCreator = new AtnCreator(parser.get(), lexer.get().getVocabulary());
+            var lexerATN = lexerAtnCreator.getATNs();
+            var parserATN = parserAtnCreator.getATNs();
 
             ParserRuleContext program = parser.invokeMemberMethod("program", new Class[0]);
 

@@ -1,5 +1,6 @@
 package hmb.antlr4.trans;
 
+import com.google.common.collect.ImmutableMap;
 import hmb.protobuf.Response.*;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.StringTools;
@@ -8,21 +9,25 @@ import org.antlr.v4.runtime.atn.*;
 
 import java.util.*;
 
-public class AtnPrinter {
+public class AtnCreator {
 
     private static <T> T getOrDefault(Map<T, T> map, T t) {
         return map.getOrDefault(t, t);
     }
 
-    public static AugmentedTransitionNetworks Print(Recognizer<?, ? extends ATNSimulator> recognizer) {
-        return Print(recognizer, null);
+    public AtnCreator(Recognizer<?, ? extends ATNSimulator> recognizer) {
+        this(recognizer, null);
     }
 
-
-    public static AugmentedTransitionNetworks Print(Recognizer<?, ? extends ATNSimulator> recognizer, final Vocabulary lexerVocabulary) {
+    public AtnCreator(Recognizer<?, ? extends ATNSimulator> recognizer, final Vocabulary lexerVocabulary) {
         final ATN atn = recognizer.getATN();
+        final ATNState firstATNState = atn.states.get(0); // 第一个，主要是针对lexer的情景
+        final ATNState lastATNState = atn.states.get(atn.states.size() - 1); // 最后一个，末尾
         final RuleStartState[] ruleToStartStates = atn.ruleToStartState;
         final var atnBuilder = AugmentedTransitionNetworks.newBuilder();
+
+        final Map<ATNState, ATNState> mapBuilder = new HashMap<>();
+        final Set<ATNState> allShowATNState = new HashSet<>();
 
 
         for (final RuleStartState RULE_START_STATE : ruleToStartStates) {
@@ -32,6 +37,14 @@ public class AtnPrinter {
             final var subAtnBuilder = SubAugmentedTransitionNetwork.newBuilder();
             final ATNState ruleStartState = getOrDefault(merged, RULE_START_STATE);  // 一般都是真正startState的下一个，用于遍历
             final ATNState ruleStopState = RULE_START_STATE.stopState;
+
+            mapBuilder.put(ruleStartState, RULE_START_STATE);
+            merged.forEach((k, v) -> {
+                if (v.equals(ruleStartState)) {
+                    v = RULE_START_STATE;
+                }
+                mapBuilder.put(k, v);
+            });
 
 //            System.out.println(ruleStartState.ruleIndex + ": " + recognizer.getRuleNames()[ruleStartState.ruleIndex] + ':');
 //            System.out.println();
@@ -91,6 +104,12 @@ public class AtnPrinter {
                     // 如果 A--t1-->B, B--t2-->A，则这两段都需要弯曲
                     final boolean isLoop = sourceToTarget.getOrDefault(triple.second(), Collections.emptySet()).contains(triple.first());
 
+                    allShowATNState.add(triple.first());
+                    allShowATNState.add(triple.second());
+                    if (triple.first().equals(lastATNState) || triple.second().equals(lastATNState)) {
+                        throw new RuntimeException("match last AtnState");
+                    }
+
                     if (addedAtnNode.add(triple.first())) {
                         subAtnBuilder.addGraphNode(
                                 AtnNode.newBuilder()
@@ -137,7 +156,32 @@ public class AtnPrinter {
 //            System.out.println();
 //            System.out.println("\n+===============================================================================+\n");
         }
-        return atnBuilder.build();
+        this.augmentedTransitionNetworks = atnBuilder.build();
+        this.mapper = ImmutableMap.copyOf(mapBuilder);
+
+        List<ATNState> states = atn.states;
+        for (ATNState state : states) {
+            // lexer 模式应该跳过第一个，因为它是辅助的首状态
+            if (state.equals(lastATNState) || (lexerVocabulary == null && state.equals(firstATNState))) {
+                continue;
+            }
+            state = this.mapper.getOrDefault(state, state);
+            if (!allShowATNState.contains(state)) {
+                throw new RuntimeException("state " + state + " not exist");
+            }
+        }
+
     }
 
+
+    private final AugmentedTransitionNetworks augmentedTransitionNetworks;
+    private final ImmutableMap<ATNState, ATNState> mapper;
+
+    public AugmentedTransitionNetworks getATNs() {
+        return augmentedTransitionNetworks;
+    }
+
+    public ImmutableMap<ATNState, ATNState> getMapper() {
+        return mapper;
+    }
 }
