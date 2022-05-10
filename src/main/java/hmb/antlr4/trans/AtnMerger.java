@@ -80,12 +80,12 @@ public class AtnMerger {
                         .toList();
 
 
-        System.out.println("onlyOneBefore: " + onlyOneBefore);
-        System.out.println("onlyOneNext: " + onlyOneNext);
-        System.out.println("onlyEpsilonBefore: " + onlyEpsilonBefore);
-        System.out.println("onlyEpsilonNext: " + onlyEpsilonNext);
-        System.out.println("onlyOneEpsilonBefore: " + onlyOneEpsilonBefore);
-        System.out.println("onlyOneEpsilonNext: " + onlyOneEpsilonNext);
+//        System.out.println("onlyOneBefore: " + onlyOneBefore);
+//        System.out.println("onlyOneNext: " + onlyOneNext);
+//        System.out.println("onlyEpsilonBefore: " + onlyEpsilonBefore);
+//        System.out.println("onlyEpsilonNext: " + onlyEpsilonNext);
+//        System.out.println("onlyOneEpsilonBefore: " + onlyOneEpsilonBefore);
+//        System.out.println("onlyOneEpsilonNext: " + onlyOneEpsilonNext);
 
 
         Map<ATNState, ATNState> result = new TreeMap<>(Comparator.comparingInt(state -> state.stateNumber));

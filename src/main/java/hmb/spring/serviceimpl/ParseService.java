@@ -135,7 +135,7 @@ public class ParseService {
             var lexerATN = Print(lexer.get());
             var parserATN = Print(parser.get(), lexer.get().getVocabulary());
 
-//            ParserRuleContext program = parser.invokeMemberMethod("program", new Class[0]);
+            ParserRuleContext program = parser.invokeMemberMethod("program", new Class[0]);
 
             return MainResponse.newBuilder().setSuccess(true).setInitialState(InitialState.newBuilder()
                     .setLexerATN(lexerATN)

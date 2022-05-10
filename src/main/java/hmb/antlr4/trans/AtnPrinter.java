@@ -33,8 +33,8 @@ public class AtnPrinter {
             final ATNState ruleStartState = getOrDefault(merged, RULE_START_STATE);  // 一般都是真正startState的下一个，用于遍历
             final ATNState ruleStopState = RULE_START_STATE.stopState;
 
-            System.out.println(ruleStartState.ruleIndex + ": " + recognizer.getRuleNames()[ruleStartState.ruleIndex] + ':');
-            System.out.println();
+//            System.out.println(ruleStartState.ruleIndex + ": " + recognizer.getRuleNames()[ruleStartState.ruleIndex] + ':');
+//            System.out.println();
 
             LinkedList<ATNState> atnStateList = new LinkedList<>();  // 用于bfs，判断循环何时退出
             atnStateList.add(ruleStartState);
@@ -128,14 +128,14 @@ public class AtnPrinter {
                                     .setLineStyle(LineStyle.newBuilder().build())
                                     .build()
                     );
-                    System.out.println(triple.first() + " --    " + transitionString + "    --> " + triple.second());
+//                    System.out.println(triple.first() + " --    " + transitionString + "    --> " + triple.second());
                 }
             }
 
             atnBuilder.addSubATN(subAtnBuilder.setRuleName(recognizer.getRuleNames()[ruleStartState.ruleIndex]).build());
 
-            System.out.println();
-            System.out.println("\n+===============================================================================+\n");
+//            System.out.println();
+//            System.out.println("\n+===============================================================================+\n");
         }
         return atnBuilder.build();
     }
