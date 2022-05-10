@@ -5,7 +5,10 @@ import hmb.protobuf.Request.*;
 import hmb.protobuf.Response.*;
 import hmb.spring.config.MyServiceException;
 import hmb.utils.clazz.ObjectManager;
+import hmb.utils.tools.OperationCreator;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.ATNSimulator;
+import org.antlr.v4.runtime.atn.ATNState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +21,7 @@ import javax.tools.ToolProvider;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
+import java.util.*;
 
 
 @Service
@@ -46,6 +49,45 @@ public class ParseService {
         }
     }
 
+    private static void addListeners(ATNSimulator atnSimulator, MainResponse.Builder mainResponseBuilder, Map<ATNState, ATNState> mapper) {
+        atnSimulator.setStartStateClosureListener(dfaState -> {
+            var operation = StartStateClosureOperation
+                    .newBuilder()
+                    .setStartingClosure(OperationCreator.makeDFAState(dfaState, mapper))
+                    .build();
+            mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
+        });
+        atnSimulator.setAddNewDFAStateListener(dfaState -> {
+            var operation = AddNewDFAStateOperation
+                    .newBuilder()
+                    .setNewDfaState(OperationCreator.makeDFAState(dfaState, mapper))
+                    .build();
+            mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
+        });
+        atnSimulator.setAddNewEdgeListener((from, to, upon) -> {
+            var operation = AddNewEdgeOperation
+                    .newBuilder()
+                    .setNewEdge(EdgeMsg.newBuilder()
+                            .setFrom(OperationCreator.makeDFAState(from, mapper))
+                            .setTo(OperationCreator.makeDFAState(to, mapper))
+                            .setUpon(upon)
+                            .build())
+                    .build();
+            mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
+        });
+        atnSimulator.setReuseStateListener((from, to, upon) -> {
+            var operation = ReuseStateOperation
+                    .newBuilder()
+                    .setReuse(EdgeMsg.newBuilder()
+                            .setFrom(OperationCreator.makeDFAState(from, mapper))
+                            .setTo(OperationCreator.makeDFAState(to, mapper))
+                            .setUpon(upon)
+                            .build())
+                    .build();
+            mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
+        });
+
+    }
 
     public MainResponse parse(MainRequest mainRequest) throws IOException {
         final String user = "u_" + mainRequest.getUserId();
@@ -121,6 +163,9 @@ public class ParseService {
                 new Class[]{CharStream.class},
                 CharStreams.fromString(mainRequest.getCode())
         )) {
+            final MainResponse.Builder mainResponseBuilder = MainResponse.newBuilder();
+
+
             CommonTokenStream tokens = new CommonTokenStream(lexer.get());
             ObjectManager<Parser> parser = new ObjectManager<>(
                     lexer,
@@ -134,11 +179,15 @@ public class ParseService {
             var lexerAtnCreator = new AtnCreator(lexer.get());
             var parserAtnCreator = new AtnCreator(parser.get(), lexer.get().getVocabulary());
             var lexerATN = lexerAtnCreator.getATNs();
+            var lexerMapper = lexerAtnCreator.getMapper();
             var parserATN = parserAtnCreator.getATNs();
+            var parserMapper = parserAtnCreator.getMapper();
 
+            // 添加parser监听
+            addListeners(parser.get().getInterpreter(), mainResponseBuilder, parserMapper);
             ParserRuleContext program = parser.invokeMemberMethod("program", new Class[0]);
 
-            return MainResponse.newBuilder().setSuccess(true).setInitialState(InitialState.newBuilder()
+            return mainResponseBuilder.setSuccess(true).setInitialState(InitialState.newBuilder()
                     .setLexerATN(lexerATN)
                     .setParserATN(parserATN)
                     .build()
