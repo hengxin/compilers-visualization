@@ -19,7 +19,7 @@ message AtnNode {
 
 message Label {
   required bool show = 1 [default = true]; // always true
-  required string formatter = 2; // string of line
+  optional string formatter = 2; // string of line
   required int32 lineHeight = 3 [default = -20]; // always -20
 }
 
@@ -28,6 +28,7 @@ message LineStyle {
 }
 
 message AtnLink {
+  required string name = 1;
   required string source = 2;  // node可能重名，下标好麻烦，因此使用唯一标识stateNumber
   required string target = 3;  // node可能重名，下标好麻烦，因此使用唯一标识stateNumber
   required Label label = 4;

@@ -117,11 +117,12 @@ public class AtnPrinter {
 
                     subAtnBuilder.addGraphEdge(
                             AtnLink.newBuilder()
+                                    .setName(transitionString)
                                     .setSource(String.valueOf(triple.first().stateNumber))
                                     .setTarget(String.valueOf(triple.second().stateNumber))
                                     .setLabel(Label.newBuilder()
                                             .setShow(Label.getDefaultInstance().getShow())
-                                            .setFormatter(transitionString)
+//                                            .setFormatter(transitionString)
                                             .setLineHeight(Label.getDefaultInstance().getLineHeight())
                                             .build())
                                     .setLineStyle(LineStyle.newBuilder().build())
