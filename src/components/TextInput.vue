@@ -170,7 +170,7 @@ export default {
         "\n" +
         "expr3:\n" +
         "    LP* ID RP* ;\n",
-      code: ""
+      code: "((2));\n" + "(((3.3)));"
     };
   },
   computed: {

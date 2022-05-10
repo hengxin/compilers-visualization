@@ -1,6 +1,7 @@
 <template>
   <a-button @click="back">back</a-button>
   <a-button @click="debug">debug</a-button>
+  <a-button @click="next" type="primary">next</a-button>
   <a-col :span="9">
     <a-card v-for="(op, idx) in optionList" :key="idx" ref="vAtnList">
       <v-chart
@@ -21,6 +22,7 @@ import {
   getInitState,
   getOptionsList,
   debug,
+  nextOperation,
   listenOptionList
 } from "@/data/show_all";
 import { input } from "@/router";
@@ -62,6 +64,9 @@ export default {
     debug() {
       ++this.num;
       debug(this.num);
+    },
+    next() {
+      nextOperation();
     }
   }
 };

@@ -56,6 +56,9 @@ let succeed_ = false;
 let initState_: proto.IInitialState;
 let globalOptionList_: any[] = [];
 
+let operatorIndex_ = 0;
+let operationList_: proto.IOperationWrapper[] = [];
+
 function _setOptionList(list: proto.ISubAugmentedTransitionNetwork[]) {
   globalOptionList_ = []; //必须要清空，否则会元素重复
   for (const subATNElement of list) {
@@ -92,6 +95,11 @@ export default function setMainResponse(resp: proto.MainResponse): boolean {
     return false;
   }
   _setOptionList(resp.initialState.parserATN.subATN);
+  {
+    operatorIndex_ = 0;
+    operationList_ = resp.operation;
+  }
+
   succeed_ = true;
   return true;
 }
@@ -118,6 +126,7 @@ export function getOptionsList(): any[] {
   return globalOptionList_;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const colorList = [
   "rgb(0,0,255)",
   "rgb(0,255,0)",
@@ -129,10 +138,144 @@ const colorList = [
 
 export function listenOptionList(optionList: any[]): void {
   globalOptionList_ = optionList;
+  resetDefaultColors();
 }
 
-export function debug(num: number): void {
+// eslint-disable-next-line @typescript-eslint/no-empty-function,@typescript-eslint/no-unused-vars
+export function debug(num: number): void {}
+
+export function nextOperation(): void {
+  if (operatorIndex_ >= operationList_.length) {
+    message.success("finished").then();
+  } else {
+    resetDefaultColors();
+    const operation = operationList_[operatorIndex_];
+    operatorIndex_++;
+    switch (operation.operationType) {
+      case proto.OperationType.StartStateClosure:
+        if (operation.startStateClosureOperation) {
+          handleStartStates(operation.startStateClosureOperation);
+          return;
+        }
+        break;
+      case proto.OperationType.AddNewDFAState:
+        if (operation.addNewDFAStateOperation) {
+          handleAddNewDFAState(operation.addNewDFAStateOperation);
+          return;
+        }
+        break;
+      case proto.OperationType.AddNewEdge:
+        if (operation.addNewEdgeOperation) {
+          handleAddNewEdge(operation.addNewEdgeOperation);
+          return;
+        }
+        break;
+      case proto.OperationType.ReuseState:
+        if (operation.reuseStateOperation) {
+          handleReuseState(operation.reuseStateOperation);
+          return;
+        }
+        break;
+      default:
+        message.error("unknown type " + operation.operationType).then();
+    }
+    message.error("empty operation").then();
+  }
+}
+
+const defaultColor = "rgb(0,0,192)";
+const startStatesColor = "rgb(128, 128, 255)";
+const addNewDFAStateColor = "rgb(0, 255, 255)";
+const addNewEdgeFromColor = "rgb(255, 0, 0)";
+const addNewEdgeToColor = "rgb(64, 0, 0)";
+const reuseFromColor = "rgb(168, 255, 0)";
+const reuseToColor = "rgb(255, 168, 0)";
+
+function resetDefaultColors() {
   for (const op of globalOptionList_) {
-    op.series[0].data[0].itemStyle.color = colorList[num % colorList.length];
+    for (const data of op.series[0].data) {
+      data.itemStyle.color = defaultColor;
+    }
+  }
+}
+
+function handleStartStates(operation: proto.IStartStateClosureOperation): void {
+  console.log(operation);
+  for (const op of globalOptionList_) {
+    for (const data of op.series[0].data) {
+      if (operation.startingClosure.atnState) {
+        for (const n of operation.startingClosure.atnState) {
+          if (parseInt(data.id) === n.atnStateNumber) {
+            data.itemStyle.color = startStatesColor;
+            break;
+          }
+        } // end-for
+      }
+    }
+  }
+}
+function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
+  console.log(operation);
+  for (const op of globalOptionList_) {
+    for (const data of op.series[0].data) {
+      if (operation.newDfaState.atnState) {
+        for (const n of operation.newDfaState.atnState) {
+          if (parseInt(data.id) === n.atnStateNumber) {
+            data.itemStyle.color = addNewDFAStateColor;
+            break;
+          }
+        } // end-for
+      }
+    }
+  }
+}
+
+function handleAddNewEdge(operation: proto.IAddNewEdgeOperation): void {
+  console.log(operation);
+  for (const op of globalOptionList_) {
+    for (const data of op.series[0].data) {
+      if (operation.newEdge.from.atnState) {
+        for (const n of operation.newEdge.from.atnState) {
+          if (parseInt(data.id) === n.atnStateNumber) {
+            data.itemStyle.color = addNewEdgeFromColor;
+            break;
+          }
+        } // end-for
+      }
+
+      if (operation.newEdge.to.atnState) {
+        for (const n of operation.newEdge.to.atnState) {
+          if (parseInt(data.id) === n.atnStateNumber) {
+            data.itemStyle.color = addNewEdgeToColor;
+            break;
+          }
+        } // end-for
+      }
+    }
+  }
+}
+
+function handleReuseState(operation: proto.IReuseStateOperation): void {
+  console.log(operation);
+  for (const op of globalOptionList_) {
+    for (const data of op.series[0].data) {
+      if (operation.reuse.from.atnState) {
+        for (const n of operation.reuse.from.atnState) {
+          if (parseInt(data.id) === n.atnStateNumber) {
+            data.itemStyle.color = reuseFromColor;
+            break;
+          }
+        } // end-for
+      }
+
+      if (operation.reuse.to.atnState) {
+        for (const n of operation.reuse.to.atnState) {
+          if (parseInt(data.id) === n.atnStateNumber) {
+            data.itemStyle.color = reuseToColor;
+            break;
+          }
+        } // end-for
+      }
+    }
   }
 }

@@ -91,8 +91,71 @@ message ParserResult {
 //=============================== ⬆ parser ⬆ ===============================
 
 
+
+
+
+//=============================== ⬇ ANTLR4Message ⬇ ===============================
+
+message AtnStateMsg {
+  required int32 atnStateNumber = 1;
+  // more...
+}
+
+message DFAStateMsg {
+  repeated AtnStateMsg atnState = 1;  // 多个ATNConfig构成的一个整体状态，称为DFAState
+  optional int32 dfaStateNumber = 2 [default = -1];
+}
+
+message EdgeMsg {
+  required DFAStateMsg from = 1;
+  required DFAStateMsg to = 2;
+  required int32 upon = 3;
+}
+
+//=============================== ⬆ ANTLR4Message ⬆ ===============================
+
+
+
+
+
+
+//=============================== ⬇ operation ⬇ ===============================
+
+enum OperationType {
+  Error = 0;
+  StartStateClosure = 2;
+  AddNewDFAState = 3;
+  AddNewEdge = 4;
+  ReuseState = 5;
+}
+
+message OperationWrapper {
+  required OperationType operationType = 1;
+  optional StartStateClosureOperation startStateClosureOperation = 2;
+  optional AddNewDFAStateOperation addNewDFAStateOperation = 3;
+  optional AddNewEdgeOperation addNewEdgeOperation = 4;
+  optional ReuseStateOperation reuseStateOperation = 5;
+}
+
+message StartStateClosureOperation {
+  required DFAStateMsg startingClosure = 1;
+}
+message AddNewDFAStateOperation {
+  required DFAStateMsg newDfaState = 1;
+}
+message AddNewEdgeOperation {
+  required EdgeMsg newEdge = 1;
+}
+message ReuseStateOperation {
+  required EdgeMsg reuse = 1;
+}
+
+//=============================== ⬆ operation ⬆ ===============================
+
+
 message MainResponse {
   required bool success = 1;
   optional InitialState initialState = 2;
   optional string errorMessage = 3;
+  repeated OperationWrapper operation = 4;
 }
