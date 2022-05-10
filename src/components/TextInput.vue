@@ -74,6 +74,11 @@ export default {
         "lexer grammar CmmLexer;\n" +
         "\n" +
         "\n" +
+        "Whitespace\n" +
+        "    :   [ \\t]+\n" +
+        "        -> channel(HIDDEN)\n" +
+        "    ;" +
+        "\n" +
         "Newline\n" +
         "    :   (   '\\r' '\\n'?\n" +
         "        |   '\\n'\n" +
