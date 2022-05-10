@@ -187,7 +187,11 @@ export default {
           }
         })
         .catch(e => {
-          message.warn("Uncaught Error");
+          if (e instanceof Error && e.message === "Network Error") {
+            message.error("NetworkError");
+          } else {
+            message.warn("Uncaught Error");
+          }
           throw e;
         });
     }
