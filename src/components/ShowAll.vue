@@ -23,6 +23,7 @@ import {
   debug,
   listenOptionList
 } from "@/data/show_all";
+import { input } from "@/router";
 
 export default {
   name: "ShowAll",
@@ -37,14 +38,16 @@ export default {
   beforeCreate() {
     if (!loaded()) {
       message.error("unloaded");
-      this.$router.push("input");
+      input();
     } else {
       console.log(getInitState());
     }
   },
   mounted() {
-    this.optionList = getOptionsList();
-    listenOptionList(this.optionList);
+    if (loaded()) {
+      this.optionList = getOptionsList();
+      listenOptionList(this.optionList);
+    }
   },
   data() {
     return {
@@ -54,7 +57,7 @@ export default {
   },
   methods: {
     back() {
-      this.$router.push("input");
+      input();
     },
     debug() {
       ++this.num;

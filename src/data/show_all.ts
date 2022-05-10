@@ -30,8 +30,10 @@ const globalConstOption = {
       edgeSymbol: ["circle", "arrow"],
       edgeSymbolSize: [3, 4],
       edgeLabel: {
-        fontSize: 8
+        fontSize: 8,
+        color: "rgb(0, 0, 0, 0.9)"
       },
+      tooltip: {},
       data: [],
       links: [],
       lineStyle: {
@@ -61,6 +63,17 @@ function _setOptionList(list: proto.ISubAugmentedTransitionNetwork[]) {
     option.title.text = subATNElement.ruleName;
     option.series[0].data = subATNElement.graphNode;
     option.series[0].links = subATNElement.graphEdge;
+    option.series[0].links.forEach(
+      (link: any) => (link.label.formatter = (v: any) => v.data.name)
+    );
+    option.tooltip.formatter = (v: any) => {
+      const data = v.data;
+      if (data.source === undefined || data.target == undefined) {
+        return data.name;
+      } else {
+        return "" + data.source + " - " + data.name + " → " + data.target;
+      }
+    };
     globalOptionList_.push(option);
   }
 }
