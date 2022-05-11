@@ -66,7 +66,7 @@ export default {
       debug(this.num);
     },
     next() {
-      nextOperation();
+      nextOperation().then();
     }
   }
 };

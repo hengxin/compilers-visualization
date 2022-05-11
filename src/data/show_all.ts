@@ -144,11 +144,10 @@ export function listenOptionList(optionList: any[]): void {
 // eslint-disable-next-line @typescript-eslint/no-empty-function,@typescript-eslint/no-unused-vars
 export function debug(num: number): void {}
 
-export function nextOperation(): void {
+export async function nextOperation(): Promise<void> {
   if (operatorIndex_ >= operationList_.length) {
     message.success("finished").then();
   } else {
-    resetDefaultColors();
     const operation = operationList_[operatorIndex_];
     operatorIndex_++;
     switch (operation.operationType) {
@@ -166,13 +165,13 @@ export function nextOperation(): void {
         break;
       case proto.OperationType.AddNewEdge:
         if (operation.addNewEdgeOperation) {
-          handleAddNewEdge(operation.addNewEdgeOperation);
+          await handleAddNewEdge(operation.addNewEdgeOperation);
           return;
         }
         break;
       case proto.OperationType.ReuseState:
         if (operation.reuseStateOperation) {
-          handleReuseState(operation.reuseStateOperation);
+          await handleReuseState(operation.reuseStateOperation);
           return;
         }
         break;
@@ -201,6 +200,7 @@ function resetDefaultColors() {
 
 function handleStartStates(operation: proto.IStartStateClosureOperation): void {
   console.log(operation);
+  resetDefaultColors();
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
       if (operation.startingClosure.atnState) {
@@ -216,6 +216,7 @@ function handleStartStates(operation: proto.IStartStateClosureOperation): void {
 }
 function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
   console.log(operation);
+  resetDefaultColors();
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
       if (operation.newDfaState.atnState) {
@@ -230,8 +231,11 @@ function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
   }
 }
 
-function handleAddNewEdge(operation: proto.IAddNewEdgeOperation): void {
+async function handleAddNewEdge(
+  operation: proto.IAddNewEdgeOperation
+): Promise<void> {
   console.log(operation);
+  resetDefaultColors();
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
       if (operation.newEdge.from.atnState) {
@@ -242,7 +246,11 @@ function handleAddNewEdge(operation: proto.IAddNewEdgeOperation): void {
           }
         } // end-for
       }
-
+    }
+  }
+  await sleep(200);
+  for (const op of globalOptionList_) {
+    for (const data of op.series[0].data) {
       if (operation.newEdge.to.atnState) {
         for (const n of operation.newEdge.to.atnState) {
           if (parseInt(data.id) === n.atnStateNumber) {
@@ -255,7 +263,10 @@ function handleAddNewEdge(operation: proto.IAddNewEdgeOperation): void {
   }
 }
 
-function handleReuseState(operation: proto.IReuseStateOperation): void {
+async function handleReuseState(
+  operation: proto.IReuseStateOperation
+): Promise<void> {
+  resetDefaultColors();
   console.log(operation);
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
@@ -267,7 +278,11 @@ function handleReuseState(operation: proto.IReuseStateOperation): void {
           }
         } // end-for
       }
-
+    }
+  }
+  await sleep(200);
+  for (const op of globalOptionList_) {
+    for (const data of op.series[0].data) {
       if (operation.reuse.to.atnState) {
         for (const n of operation.reuse.to.atnState) {
           if (parseInt(data.id) === n.atnStateNumber) {
@@ -278,4 +293,8 @@ function handleReuseState(operation: proto.IReuseStateOperation): void {
       }
     }
   }
+}
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
