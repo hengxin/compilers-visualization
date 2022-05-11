@@ -8,11 +8,13 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.Triple;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public abstract class ATNSimulator {
@@ -65,6 +67,17 @@ public abstract class ATNSimulator {
 		}
 	}
 
+	private BiConsumer<List<DFAState>, List<Triple<DFAState, DFAState, String>>> switchTableListener = null;
+
+	// 两个list需要深拷贝
+	public void setSwitchTableListener(BiConsumer<List<DFAState>, List<Triple<DFAState, DFAState, String>>> listener) {
+		this.switchTableListener = listener;
+	}
+	protected void listenSwitchTable(List<DFAState> dfaStates, List<Triple<DFAState, DFAState, String>> edges) {
+		if (switchTableListener != null) {
+			switchTableListener.accept(dfaStates, edges);
+		}
+	}
 
 
 

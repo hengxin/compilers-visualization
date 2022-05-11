@@ -44,6 +44,13 @@ public abstract class OperationCreator {
                 .build();
     }
 
+    public static OperationWrapper makeOperation(SwitchTableOperation operation) {
+        return OperationWrapper.newBuilder()
+                .setOperationType(OperationType.SwitchTable)
+                .setSwitchTableOperation(operation)
+                .build();
+    }
+
     private static AtnStateMsg makeATNState(ATNConfig config, Map<ATNState, ATNState> mapper) {
         return AtnStateMsg.newBuilder()
                 .setAtnStateNumber(mapper.getOrDefault(config.state, config.state).stateNumber)

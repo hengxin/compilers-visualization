@@ -19,10 +19,7 @@ import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.VocabularyImpl;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.dfa.DFAState;
-import org.antlr.v4.runtime.misc.DoubleKeyMap;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.misc.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -401,7 +398,12 @@ public class ParserATNSimulator extends ATNSimulator {
 				if ( debug ) System.out.println("s0 is not null ");
 			}
 
+			List<DFAState> dfaStates = new ArrayList<>(dfa.states.keySet());
+			this.listenSwitchTable(dfaStates, dfa.edges);
+
 			int alt = execATN(dfa, s0, input, index, outerContext);
+
+
 			if ( debug ) System.out.println("  DFA (hash="+System.identityHashCode(dfa)+") after predictATN: \n"+ dfa.toString(parser.getVocabulary()));
 			return alt;
 		}

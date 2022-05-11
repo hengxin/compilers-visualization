@@ -86,7 +86,22 @@ public class ParseService {
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
-
+        atnSimulator.setSwitchTableListener((dfaStateList, edgeList) -> {
+            var operation = SwitchTableOperation
+                    .newBuilder()
+                    .addAllDfaStates(dfaStateList.stream().map(
+                            s -> OperationCreator.makeDFAState(s, mapper)
+                    ).toList())
+                    .addAllEdges(edgeList.stream().map(
+                            e -> EdgeMsg.newBuilder()
+                                    .setFrom(OperationCreator.makeDFAState(e.a, mapper))
+                                    .setTo(OperationCreator.makeDFAState(e.b, mapper))
+                                    .setUpon(e.c)
+                                    .build()
+                    ).toList())
+                    .build();
+            mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
+        });
     }
 
     public MainResponse parse(MainRequest mainRequest) throws IOException {
