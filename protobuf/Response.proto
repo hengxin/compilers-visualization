@@ -98,6 +98,7 @@ message ParserResult {
 
 message AtnStateMsg {
   required int32 atnStateNumber = 1;
+  required string context = 2;
   // more...
 }
 
