@@ -7,7 +7,6 @@ import org.antlr.v4.runtime.dfa.DFAState;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static hmb.protobuf.Response.*;
 
@@ -48,6 +47,20 @@ public abstract class OperationCreator {
         return OperationWrapper.newBuilder()
                 .setOperationType(OperationType.SwitchTable)
                 .setSwitchTableOperation(operation)
+                .build();
+    }
+
+    public static OperationWrapper makeOperation(ConsumeTokenOperation operation) {
+        return OperationWrapper.newBuilder()
+                .setOperationType(OperationType.ConsumeToken)
+                .setConsumeTokenOperation(operation)
+                .build();
+    }
+
+    public static OperationWrapper makeOperation(EditTreeOperation operation) {
+        return OperationWrapper.newBuilder()
+                .setOperationType(OperationType.EditTree)
+                .setEditTreeOperation(operation)
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package hmb.spring.serviceimpl;
 
 import hmb.antlr4.trans.AtnCreator;
+import hmb.antlr4.trans.EditTreeListener;
 import hmb.protobuf.Request.*;
 import hmb.protobuf.Response.*;
 import hmb.spring.config.MyServiceException;
@@ -99,6 +100,20 @@ public class ParseService {
                                     .setUpon(e.c)
                                     .build()
                     ).toList())
+                    .build();
+            mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
+        });
+    }
+
+    private static void addListeners(Parser parser, MainResponse.Builder mainResponseBuilder, Vocabulary lexerVocabulary) {
+        parser.setConsumeTokenListener(token -> {
+            var operation = ConsumeTokenOperation.newBuilder()
+                    .setTokenConsumed(TokenMsg.newBuilder()
+                            .setTokenType(token.getType())
+                            .setTokenRule(lexerVocabulary.getSymbolicName(token.getType()))
+                            .setTokenText(token.getText())
+                            .setChannel(token.getChannel())
+                            .build())
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
@@ -214,6 +229,9 @@ public class ParseService {
 
             // 添加parser监听
             addListeners(parser.get().getInterpreter(), mainResponseBuilder, parserMapper);
+            addListeners(parser.get(), mainResponseBuilder, lexer.get().getVocabulary());
+            parser.get().addParseListener(new EditTreeListener(mainResponseBuilder, lexer.get().getVocabulary(), parser.get().getRuleNames()));
+            parser.get().setErrorHandler(new BailErrorStrategy());
             ParserRuleContext program = parser.invokeMemberMethod("program", new Class[0]);
 
             return mainResponseBuilder.setSuccess(true).setInitialState(InitialState.newBuilder()

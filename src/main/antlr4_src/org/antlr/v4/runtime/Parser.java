@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.function.Consumer;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
 public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
@@ -558,6 +559,17 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		listener.syntaxError(this, offendingToken, line, charPositionInLine, msg, e);
 	}
 
+	private Consumer<Token> consumeTokenListener = null;
+	public void setConsumeTokenListener(Consumer<Token> listener) {
+		this.consumeTokenListener = listener;
+	}
+	private void listenConsumeToken(Token token) {
+		if (consumeTokenListener != null) {
+			consumeTokenListener.accept(token);
+		}
+	}
+
+
 	/**
 	 * Consume and return the {@linkplain #getCurrentToken current symbol}.
 	 *
@@ -597,6 +609,7 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 				}
 			}
 			else {
+				listenConsumeToken(o);
 				System.out.println("mode = consume ");
 				TerminalNode node = _ctx.addChild(createTerminalNode(_ctx,o));
 				if (_parseListeners != null) {
