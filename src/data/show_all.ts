@@ -59,6 +59,9 @@ let globalOptionList_: any[] = [];
 let operatorIndex_ = 0;
 let operationList_: proto.IOperationWrapper[] = [];
 
+let currentTokenIndex_ = 0;
+let tokenList_: proto.ITokenMsg[] = [];
+
 function _setOptionList(list: proto.ISubAugmentedTransitionNetwork[]) {
   globalOptionList_ = []; //必须要清空，否则会元素重复
   for (const subATNElement of list) {
@@ -98,6 +101,10 @@ export default function setMainResponse(resp: proto.MainResponse): boolean {
   {
     operatorIndex_ = 0;
     operationList_ = resp.operation;
+  }
+  {
+    currentTokenIndex_ = 0;
+    setTokenList(resp.token);
   }
 
   succeed_ = true;
@@ -139,6 +146,29 @@ const colorList = [
 export function listenOptionList(optionList: any[]): void {
   globalOptionList_ = optionList;
   resetDefaultColors();
+}
+
+export function getTokenList(): proto.ITokenMsg[] {
+  check();
+  return tokenList_;
+}
+
+function resetTokenColor(): void {
+  tokenList_.forEach(token => (token.background = "rgb(255, 255, 255)"));
+}
+
+function setTokenList(list: proto.ITokenMsg[]): void {
+  tokenList_ = list;
+  resetTokenColor();
+}
+
+export function listenTokenList(list: proto.ITokenMsg[]): void {
+  currentTokenIndex_ = 0;
+  setTokenList(list);
+}
+
+function nextToken(): void {
+  currentTokenIndex_++;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function,@typescript-eslint/no-unused-vars
