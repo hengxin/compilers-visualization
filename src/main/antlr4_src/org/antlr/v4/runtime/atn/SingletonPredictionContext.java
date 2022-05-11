@@ -6,6 +6,8 @@
 
 package org.antlr.v4.runtime.atn;
 
+import java.util.Map;
+
 public class SingletonPredictionContext extends PredictionContext {
 	public final PredictionContext parent;
 	public final int returnState;
@@ -70,5 +72,20 @@ public class SingletonPredictionContext extends PredictionContext {
 			return String.valueOf(returnState);
 		}
 		return String.valueOf(returnState)+" "+up;
+	}
+
+	@Override
+	public String toString(Map<ATNState, ATNState> mapper) {
+		String up = parent!=null ? parent.toString(mapper) : "";
+		ATNState atnState = new BasicState();
+		atnState.stateNumber = returnState;
+		final int mappedReturnState = mapper.getOrDefault(atnState, atnState).stateNumber;
+		if ( up.length()==0 ) {
+			if ( mappedReturnState == EMPTY_RETURN_STATE ) {
+				return "";
+			}
+			return String.valueOf(mappedReturnState);
+		}
+		return mappedReturnState +" "+up;
 	}
 }

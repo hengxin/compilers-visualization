@@ -645,6 +645,14 @@ public abstract class PredictionContext {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return super.toString();
+	}
+
+	public abstract String toString(Map<ATNState, ATNState> mapper);
+
+
 	public String toString(Recognizer<?,?> recog) {
 		return toString();
 //		return toString(recog, ParserRuleContext.EMPTY);

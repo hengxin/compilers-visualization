@@ -7,6 +7,7 @@
 package org.antlr.v4.runtime.atn;
 
 import java.util.Arrays;
+import java.util.Map;
 
 public class ArrayPredictionContext extends PredictionContext {
 	/** Parent can be null only if full ctx mode and we make an array
@@ -93,6 +94,32 @@ public class ArrayPredictionContext extends PredictionContext {
 			if ( parents[i]!=null ) {
 				buf.append(' ');
 				buf.append(parents[i].toString());
+			}
+			else {
+				buf.append("null");
+			}
+		}
+		buf.append("]");
+		return buf.toString();
+	}
+
+	@Override
+	public String toString(Map<ATNState, ATNState> mapper) {
+		if ( isEmpty() ) return "[]";
+		StringBuilder buf = new StringBuilder();
+		buf.append("[");
+		for (int i=0; i<returnStates.length; i++) {
+			ATNState atnState = new BasicState();
+			atnState.stateNumber = returnStates[i];
+			final int mappedReturnState = mapper.getOrDefault(atnState, atnState).stateNumber;
+			if ( i>0 ) buf.append(", ");
+			if ( mappedReturnState==EMPTY_RETURN_STATE ) {
+				continue;
+			}
+			buf.append(mappedReturnState);
+			if ( parents[i]!=null ) {
+				buf.append(' ');
+				buf.append(parents[i].toString(mapper));
 			}
 			else {
 				buf.append("null");

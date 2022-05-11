@@ -47,6 +47,7 @@ public abstract class OperationCreator {
     private static AtnStateMsg makeATNState(ATNConfig config, Map<ATNState, ATNState> mapper) {
         return AtnStateMsg.newBuilder()
                 .setAtnStateNumber(mapper.getOrDefault(config.state, config.state).stateNumber)
+                .setContext(config.context.toString(mapper))
                 .build();
     }
 
