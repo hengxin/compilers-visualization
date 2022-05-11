@@ -64,6 +64,13 @@ public abstract class OperationCreator {
                 .build();
     }
 
+    public static OperationWrapper makeOperation(EndAdaptiveOperation operation) {
+        return OperationWrapper.newBuilder()
+                .setOperationType(OperationType.EndAdaptive)
+                .setEndAdaptiveOperation(operation)
+                .build();
+    }
+
     private static AtnStateMsg makeATNState(ATNConfig config, Map<ATNState, ATNState> mapper) {
         return AtnStateMsg.newBuilder()
                 .setAtnStateNumber(mapper.getOrDefault(config.state, config.state).stateNumber)

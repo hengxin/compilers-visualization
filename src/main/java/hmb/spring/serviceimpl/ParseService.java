@@ -103,6 +103,12 @@ public class ParseService {
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
+        atnSimulator.setEndAdaptiveListener(alt -> {
+            var operation = EndAdaptiveOperation.newBuilder()
+                    .setAlt(alt)
+                    .build();
+            mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
+        });
     }
 
     private static void addListeners(Parser parser, MainResponse.Builder mainResponseBuilder, Vocabulary lexerVocabulary) {

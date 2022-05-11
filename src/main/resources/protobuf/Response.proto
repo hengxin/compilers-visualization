@@ -131,6 +131,7 @@ enum OperationType {
   SwitchTable = 6;
   ConsumeToken = 7;
   EditTree = 8;
+  EndAdaptive = 9;
 }
 
 message OperationWrapper {
@@ -142,6 +143,7 @@ message OperationWrapper {
   optional SwitchTableOperation switchTableOperation = 6;
   optional ConsumeTokenOperation consumeTokenOperation = 7;
   optional EditTreeOperation editTreeOperation = 8;
+  optional EndAdaptiveOperation endAdaptiveOperation = 9;
 }
 
 message StartStateClosureOperation {
@@ -165,6 +167,9 @@ message ConsumeTokenOperation {
 }
 message EditTreeOperation {
   required ParserState parserState = 1;
+}
+message EndAdaptiveOperation {
+  required int32 alt = 1;
 }
 //=============================== ⬆ operation ⬆ ===============================
 

@@ -80,6 +80,16 @@ public abstract class ATNSimulator {
 		}
 	}
 
+	// 预测成功
+	private Consumer<Integer> endAdaptiveListener = null;
+	public void setEndAdaptiveListener(Consumer<Integer> listener) {
+		this.endAdaptiveListener = listener;
+	}
+	protected void listenEndAdaptive(int alt) {
+		if (endAdaptiveListener != null) {
+			endAdaptiveListener.accept(alt);
+		}
+	}
 
 
 	/**

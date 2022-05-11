@@ -402,7 +402,7 @@ public class ParserATNSimulator extends ATNSimulator {
 			this.listenSwitchTable(dfaStates, dfa.edges);
 
 			int alt = execATN(dfa, s0, input, index, outerContext);
-
+			this.listenEndAdaptive(alt);
 
 			if ( debug ) System.out.println("  DFA (hash="+System.identityHashCode(dfa)+") after predictATN: \n"+ dfa.toString(parser.getVocabulary()));
 			return alt;
