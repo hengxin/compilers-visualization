@@ -205,6 +205,13 @@ export async function nextOperation(): Promise<void> {
           return;
         }
         break;
+      case proto.OperationType.SwitchTable:
+        if (operation.switchTableOperation) {
+          message.success("do nothing");
+          handleSwitchTable(operation.switchTableOperation);
+          return;
+        }
+        break;
       default:
         message.error("unknown type " + operation.operationType).then();
     }
@@ -323,6 +330,10 @@ async function handleReuseState(
       }
     }
   }
+}
+
+function handleSwitchTable(operation: proto.ISwitchTableOperation): void {
+  console.log(operation);
 }
 
 async function sleep(ms: number): Promise<void> {
