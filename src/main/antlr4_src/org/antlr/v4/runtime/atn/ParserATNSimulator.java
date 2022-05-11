@@ -571,7 +571,7 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		DFAState target = edges[t + 1];
 		if (target != null) {
-			listenReuseState(previousD, target, t);
+			listenReuseState(previousD, target, getTokenName(t));
 		}
 		if (debug && target != null) {
 			System.out.println("Reuse state "+previousD.stateNumber+
@@ -2008,11 +2008,8 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		Vocabulary vocabulary = parser != null ? parser.getVocabulary() : VocabularyImpl.EMPTY_VOCABULARY;
 		String displayName = vocabulary.getDisplayName(t);
-		if (displayName.equals(Integer.toString(t))) {
-			return displayName;
-		}
+		return displayName;
 
-		return displayName + "<" + t + ">";
 	}
 
 	public String getLookaheadName(TokenStream input) {
@@ -2108,7 +2105,8 @@ public class ParserATNSimulator extends ATNSimulator {
 			return to;
 		}
 
-		listenAddNewEdge(from, to, t);
+		listenAddNewEdge(from, to, getTokenName(t));
+		dfa.edges.add(new Triple<>(from, to, getTokenName(t)));
 		if ( debug ) {
 			System.out.println("ADD_EDGE   "+from+"   -->   "+to+" upon "+getTokenName(t));
 		}

@@ -45,21 +45,21 @@ public abstract class ATNSimulator {
 		}
 	}
 
-	private TriConsumer<DFAState, DFAState, Integer> addNewEdgeListener = null;
-	public void setAddNewEdgeListener(TriConsumer<DFAState, DFAState, Integer> listener) {
+	private TriConsumer<DFAState, DFAState, String> addNewEdgeListener = null;
+	public void setAddNewEdgeListener(TriConsumer<DFAState, DFAState, String> listener) {
 		this.addNewEdgeListener = listener;
 	}
-	protected void listenAddNewEdge(DFAState from, DFAState to, int upon) {
+	protected void listenAddNewEdge(DFAState from, DFAState to, String upon) {
 		if (addNewEdgeListener != null) {
 			addNewEdgeListener.accept(from, to, upon);
 		}
 	}
 
-	private TriConsumer<DFAState, DFAState, Integer> reuseStateListener = null;
-	public void setReuseStateListener(TriConsumer<DFAState, DFAState, Integer> listener) {
+	private TriConsumer<DFAState, DFAState, String> reuseStateListener = null;
+	public void setReuseStateListener(TriConsumer<DFAState, DFAState, String> listener) {
 		this.reuseStateListener = listener;
 	}
-	protected void listenReuseState(DFAState from, DFAState to, int upon) {
+	protected void listenReuseState(DFAState from, DFAState to, String upon) {
 		if (reuseStateListener != null) {
 			reuseStateListener.accept(from, to, upon);
 		}

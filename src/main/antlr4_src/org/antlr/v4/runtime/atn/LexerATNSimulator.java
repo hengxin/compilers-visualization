@@ -660,7 +660,7 @@ public class LexerATNSimulator extends ATNSimulator {
 			return;
 		}
 
-		listenAddNewEdge(p, q, t);
+		listenAddNewEdge(p, q, StringTools.replace(t));
 		if ( debug ) {
 			System.out.println("ADD EDGE "+p+"   --->   "+q+" upon '"+(StringTools.replace(t)) + "'");
 		}

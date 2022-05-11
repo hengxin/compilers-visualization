@@ -110,7 +110,7 @@ message DFAStateMsg {
 message EdgeMsg {
   required DFAStateMsg from = 1;
   required DFAStateMsg to = 2;
-  required int32 upon = 3;
+  required string upon = 3;
 }
 
 //=============================== ⬆ ANTLR4Message ⬆ ===============================
