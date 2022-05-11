@@ -4,12 +4,14 @@
   <a-button @click="next" type="primary">next</a-button>
   <br />
   <div v-for="(token, idx) in tokenList" :key="idx" style="display: inline">
-    <div style="border: 1px solid #c6c6c6; display: inline-block"
-          :style="'background: ' + token.background">
+    <div
+      style="border: 1px solid #c6c6c6; display: inline-block"
+      :style="'background: ' + token.background"
+    >
       <div>
-        {{ token.tokenRule}}
-        <br>
-        {{token.tokenText }}
+        {{ token.tokenRule }}
+        <br />
+        {{ token.tokenText }}
       </div>
     </div>
   </div>
