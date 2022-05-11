@@ -129,6 +129,9 @@ enum OperationType {
   AddNewEdge = 4;
   ReuseState = 5;
   SwitchTable = 6;
+  ConsumeToken = 7;
+  EditTree = 8;
+  EndAdaptive = 9;
 }
 
 message OperationWrapper {
@@ -138,6 +141,9 @@ message OperationWrapper {
   optional AddNewEdgeOperation addNewEdgeOperation = 4;
   optional ReuseStateOperation reuseStateOperation = 5;
   optional SwitchTableOperation switchTableOperation = 6;
+  optional ConsumeTokenOperation consumeTokenOperation = 7;
+  optional EditTreeOperation editTreeOperation = 8;
+  optional EndAdaptiveOperation endAdaptiveOperation = 9;
 }
 
 message StartStateClosureOperation {
@@ -156,7 +162,15 @@ message SwitchTableOperation {
   repeated DFAStateMsg dfaStates = 1;
   repeated EdgeMsg edges = 2;
 }
-
+message ConsumeTokenOperation {
+  required TokenMsg tokenConsumed = 1;
+}
+message EditTreeOperation {
+  required ParserState parserState = 1;
+}
+message EndAdaptiveOperation {
+  required int32 alt = 1;
+}
 //=============================== ⬆ operation ⬆ ===============================
 
 

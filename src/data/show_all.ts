@@ -207,8 +207,29 @@ export async function nextOperation(): Promise<void> {
         break;
       case proto.OperationType.SwitchTable:
         if (operation.switchTableOperation) {
-          message.success("do nothing");
+          message.success("switchTable");
           handleSwitchTable(operation.switchTableOperation);
+          return;
+        }
+        break;
+      case proto.OperationType.ConsumeToken:
+        if (operation.consumeTokenOperation) {
+          message.success("ConsumeToken");
+          handleConsumeToken(operation.consumeTokenOperation);
+          return;
+        }
+        break;
+      case proto.OperationType.EditTree:
+        if (operation.editTreeOperation) {
+          message.success("EditTree");
+          handleEditTree(operation.editTreeOperation);
+          return;
+        }
+        break;
+      case proto.OperationType.EndAdaptive:
+        if (operation.endAdaptiveOperation) {
+          message.success("EndAdaptivePredict");
+          handleEndAdaptive(operation.endAdaptiveOperation);
           return;
         }
         break;
@@ -336,6 +357,17 @@ function handleSwitchTable(operation: proto.ISwitchTableOperation): void {
   console.log(operation);
 }
 
+function handleConsumeToken(operation: proto.IConsumeTokenOperation): void {
+  console.log(operation);
+}
+
+function handleEditTree(operation: proto.IEditTreeOperation): void {
+  console.log(operation);
+}
+
+function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
+  console.log(operation);
+}
 async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
