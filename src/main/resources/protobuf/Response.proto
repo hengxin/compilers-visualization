@@ -154,9 +154,22 @@ message ReuseStateOperation {
 //=============================== ⬆ operation ⬆ ===============================
 
 
+//=============================== ⬇ tokenStream ⬇ ===============================
+
+message TokenMsg {
+  required int32 tokenType = 1;
+  required string tokenText = 2;
+  required string tokenRule = 3;
+  required int32 channel = 4;
+  optional string background = 5;
+}
+
+//=============================== ⬆ tokenStream ⬆ ===============================
+
 message MainResponse {
   required bool success = 1;
   optional InitialState initialState = 2;
   optional string errorMessage = 3;
   repeated OperationWrapper operation = 4;
+  repeated TokenMsg token = 5;
 }

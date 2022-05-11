@@ -166,6 +166,20 @@ public class ParseService {
             final MainResponse.Builder mainResponseBuilder = MainResponse.newBuilder();
 
 
+            List<? extends Token> allTokens = lexer.get().getAllTokens();
+            lexer.get().reset();  // 记得恢复
+
+            for (Token token : allTokens) {
+                if (token.getChannel() == Token.DEFAULT_CHANNEL) {
+                    mainResponseBuilder.addToken(TokenMsg.newBuilder()
+                            .setTokenType(token.getType())
+                            .setTokenRule(lexer.get().getVocabulary().getSymbolicName(token.getType()))
+                            .setTokenText(token.getText())
+                            .setChannel(token.getChannel())
+                            .build());
+                }
+            }
+
             CommonTokenStream tokens = new CommonTokenStream(lexer.get());
             ObjectManager<Parser> parser = new ObjectManager<>(
                     lexer,
