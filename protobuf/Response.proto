@@ -78,6 +78,7 @@ message LexerResult {
 message TreeNode{
   required string name = 1;
   repeated TreeNode children = 2;
+  required ItemStyle itemStyle = 3;
 }
 
 message ParserState{

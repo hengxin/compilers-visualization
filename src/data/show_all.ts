@@ -52,6 +52,60 @@ const globalConstOption = {
   ]
 };
 
+let treeOption_ = {
+  tooltip: {
+    trigger: "item",
+    triggerOn: "mousemove"
+  },
+  series: [
+    {
+      type: "tree",
+      data: [
+        {
+          name: "program",
+          children: [],
+          itemStyle: {
+            color: "rgb(254,254,254)"
+          }
+        }
+      ],
+      left: "2%",
+      right: "2%",
+      top: "12%",
+      bottom: "12%",
+      symbol: "emptyCircle",
+      orient: "vertical",
+      expandAndCollapse: true,
+      initialTreeDepth: -1,
+      label: {
+        position: "top",
+        rotate: -90,
+        verticalAlign: "middle",
+        align: "right",
+        fontSize: 9
+      },
+      leaves: {
+        label: {
+          position: "bottom",
+          rotate: -90,
+          verticalAlign: "middle",
+          align: "left"
+        }
+      },
+      animationDurationUpdate: 200
+    }
+  ]
+};
+
+export function getTreeOption(): any {
+  return treeOption_;
+}
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export function listenTreeOption(list: any): void {
+  treeOption_ = list;
+  console.log(treeOption_);
+}
+
 let succeed_ = false;
 let initState_: proto.IInitialState;
 let globalOptionList_: any[] = [];
@@ -105,6 +159,9 @@ export default function setMainResponse(resp: proto.MainResponse): boolean {
   }
   {
     setTokenList(resp.token);
+  }
+  {
+    treeOption_.series[0].data = [];
   }
 
   succeed_ = true;
@@ -388,6 +445,12 @@ function handleConsumeToken(operation: proto.IConsumeTokenOperation): void {
 
 function handleEditTree(operation: proto.IEditTreeOperation): void {
   console.log(operation);
+  console.log(treeOption_.series[0].data);
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  treeOption_.series[0].data = [operation.parserState.root];
+  console.log(treeOption_.series[0].data);
 }
 
 function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {

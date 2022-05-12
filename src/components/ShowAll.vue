@@ -15,15 +15,26 @@
       </div>
     </div>
   </div>
-  <a-col :span="9">
-    <a-card v-for="(op, idx) in optionList" :key="idx" ref="vAtnList">
-      <v-chart
-        class="chart"
-        :option="op"
-        style="height: 90%; width: 100%"
-      ></v-chart>
-    </a-card>
-  </a-col>
+  <a-row>
+    <a-col :span="9">
+      <a-card v-for="(op, idx) in optionList" :key="idx" ref="vAtnList">
+        <v-chart
+          class="chart"
+          :option="op"
+          style="height: 90%; width: 100%"
+        ></v-chart>
+      </a-card>
+    </a-col>
+    <a-col :span="15">
+      <a-card>
+        <v-chart
+          class="chart"
+          :option="treeData"
+          style="height: 400%; width: 100%"
+        />
+      </a-card>
+    </a-col>
+  </a-row>
 </template>
 
 <script>
@@ -38,7 +49,9 @@ import {
   nextOperation,
   listenOptionList,
   getTokenList,
-  listenTokenList
+  listenTokenList,
+  getTreeOption,
+  listenTreeOption
 } from "@/data/show_all";
 import { input } from "@/router";
 
@@ -48,7 +61,6 @@ export default {
     VChart,
     AButton: Button,
     ACard: Card,
-    // eslint-disable-next-line vue/no-unused-components
     ARow: Row,
     ACol: Col
   },
@@ -66,6 +78,8 @@ export default {
       listenOptionList(this.optionList);
       this.tokenList = getTokenList();
       listenTokenList(this.tokenList);
+      this.treeData = getTreeOption();
+      listenTreeOption(this.treeData);
     }
   },
   data() {
@@ -80,7 +94,8 @@ export default {
           channel: 0,
           background: "rgb(255,255,255)"
         }
-      ]
+      ],
+      treeData: getTreeOption()
     };
   },
   methods: {
