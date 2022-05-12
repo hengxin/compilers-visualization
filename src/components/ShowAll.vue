@@ -17,7 +17,7 @@
   >
     当前操作: {{ currentOperationString }}
   </a-button>
-  <a-button @click="next" type="primary" style="width: 30%; text-align: left">
+  <a-button @click="nextOp" type="primary" style="width: 30%; text-align: left">
     {{ nextOperationButtonString }}
   </a-button>
   <br />
@@ -109,7 +109,29 @@ export default {
   mounted() {
     if (loaded()) {
       this.init();
+      document.onkeydown = () => {
+        let key = window.event.keyCode;
+        if (window.event.altKey) {
+          // mac平台是option键
+          if (key === 39) {
+            // 右箭头, 前进一步
+            window.event.preventDefault();
+            this.nextOp();
+          } else if (key === 37) {
+            // 左箭头, 回退一步
+            window.event.preventDefault();
+            this.playbackOnce();
+          } else if (key === 13) {
+            // 回车, 刷新
+            window.event.preventDefault();
+            this.playbackOnce().then(() => this.nextOp());
+          }
+        }
+      };
     }
+  },
+  unmounted() {
+    document.onkeydown = () => {};
   },
   data() {
     return {
@@ -156,16 +178,16 @@ export default {
     playbackOnce() {
       this.currentOperationButtonDisable = true;
       const index = getOperatorIndex();
-      this.playbackTo(index - 1);
+      return this.playbackTo(index - 1);
     },
     playbackTo(index) {
       reload();
       this.init();
-      playbackAllOperations(index).then(() => {
+      return playbackAllOperations(index).then(() => {
         this.currentOperationButtonDisable = false;
       });
     },
-    next() {
+    nextOp() {
       nextOperation().then();
     },
     onMenuClick(item) {
