@@ -112,6 +112,7 @@ function setTreeData(root: proto.ITreeNode): void {
   treeOption_.series[0].data = [root];
 }
 
+let _MainResponseByteBuffer_ = new Uint8Array();
 let succeed_ = false;
 let initState_: proto.IInitialState;
 let globalOptionList_: any[] = [];
@@ -123,7 +124,7 @@ let currentTokenIndex_ = 0;
 let tryPredictTokenIndex_ = 0;
 let tokenList_: proto.ITokenMsg[] = [];
 
-function _setOptionList(list: proto.ISubAugmentedTransitionNetwork[]) {
+function setOptionList_(list: proto.ISubAugmentedTransitionNetwork[]) {
   globalOptionList_ = []; //必须要清空，否则会元素重复
   for (const subATNElement of list) {
     const option = JSON.parse(JSON.stringify(globalConstOption));
@@ -149,6 +150,17 @@ export default function setMainResponse(resp: proto.MainResponse): boolean {
   if (succeed_) {
     console.log("re init");
   }
+  _MainResponseByteBuffer_ = Uint8Array.from(
+    proto.MainResponse.encode(resp).finish()
+  );
+  if (!init_(resp)) {
+    return false;
+  }
+  succeed_ = true;
+  return true;
+}
+
+function init_(resp: proto.MainResponse): boolean {
   if (!resp.initialState) {
     console.log("resp.initialState = " + resp.initialState);
     return false;
@@ -158,7 +170,7 @@ export default function setMainResponse(resp: proto.MainResponse): boolean {
     console.log("parserATN = " + resp.initialState.parserATN.subATN);
     return false;
   }
-  _setOptionList(resp.initialState.parserATN.subATN);
+  setOptionList_(resp.initialState.parserATN.subATN);
   {
     operatorIndex_ = 0;
     operationList_ = resp.operation;
@@ -169,9 +181,16 @@ export default function setMainResponse(resp: proto.MainResponse): boolean {
   {
     treeOption_.series[0].data = [];
   }
-
-  succeed_ = true;
   return true;
+}
+
+export function reload(): void {
+  const resp: proto.MainResponse = proto.MainResponse.decode(
+    _MainResponseByteBuffer_
+  );
+  if (!init_(resp)) {
+    message.error("reload failed").then();
+  }
 }
 
 export function loaded(): boolean {
@@ -336,7 +355,9 @@ function adaptivePredict(): void {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function,@typescript-eslint/no-unused-vars
-export function debug(num: number): void {}
+export function debug(num: number): void {
+  reload();
+}
 
 export async function nextOperation(): Promise<void> {
   if (operatorIndex_ >= operationList_.length) {

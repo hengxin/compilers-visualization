@@ -79,18 +79,7 @@ export default {
   },
   mounted() {
     if (loaded()) {
-      this.optionList = getOptionsList();
-      listenOptionList(this.optionList);
-      this.tokenList = getTokenList();
-      listenTokenList(this.tokenList);
-      this.treeData = getTreeOption();
-      listenTreeOption(this.treeData);
-      this.nextOperationString = "next";
-      setNextButtonStringOnChanged(next => {
-        this.currentOperationString = this.nextOperationString;
-        this.nextOperationString = next;
-      });
-      this.currentOperationString = "";
+      this.init();
     }
   },
   data() {
@@ -112,9 +101,24 @@ export default {
     };
   },
   methods: {
+    init() {
+      this.optionList = getOptionsList();
+      listenOptionList(this.optionList);
+      this.tokenList = getTokenList();
+      listenTokenList(this.tokenList);
+      this.treeData = getTreeOption();
+      listenTreeOption(this.treeData);
+      this.nextOperationString = "next";
+      setNextButtonStringOnChanged(next => {
+        this.currentOperationString = this.nextOperationString;
+        this.nextOperationString = next;
+      });
+      this.currentOperationString = "";
+    },
     debug() {
       ++this.num;
       debug(this.num);
+      this.init();
     },
     next() {
       nextOperation().then();
