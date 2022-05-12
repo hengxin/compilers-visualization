@@ -13,6 +13,11 @@ public class EditTreeListener implements ParseTreeListener {
     private final Response.MainResponse.Builder builder;
     private final ToTreeNodeUtils toTreeNodeUtils;
 
+    public EditTreeListener(Response.MainResponse.Builder builder, ToTreeNodeUtils toTreeNodeUtils) {
+        this.builder = builder;
+        this.toTreeNodeUtils = toTreeNodeUtils;
+    }
+
     public EditTreeListener(Response.MainResponse.Builder builder, Vocabulary lexerVocabulary, String[] parserRuleNames) {
         this.builder = builder;
         this.toTreeNodeUtils = new ToTreeNodeUtils(lexerVocabulary, parserRuleNames);
@@ -26,11 +31,13 @@ public class EditTreeListener implements ParseTreeListener {
 
     @Override
     public void visitTerminal(TerminalNode node) {
-        builder.addOperation(
-                OperationCreator.makeOperation(Response.EditTreeOperation.newBuilder()
-                        .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(node, node)))
-                        .build())
-        );
+//        啥都不用干，consume Token 已经帮忙搞定了
+//
+//        builder.addOperation(
+//                OperationCreator.makeOperation(Response.EditTreeOperation.newBuilder()
+//                        .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(node, node)))
+//                        .build())
+//        );
     }
 
     @Override

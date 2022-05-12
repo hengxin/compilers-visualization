@@ -18,12 +18,7 @@ import org.antlr.v4.runtime.atn.RuleTransition;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.misc.IntegerStack;
 import org.antlr.v4.runtime.misc.IntervalSet;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ErrorNodeImpl;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.antlr.v4.runtime.tree.TerminalNodeImpl;
+import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePattern;
 import org.antlr.v4.runtime.tree.pattern.ParseTreePatternMatcher;
 
@@ -32,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /** This is all the parsing support code essentially; most of it is error recovery stuff. */
@@ -559,13 +555,13 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 		listener.syntaxError(this, offendingToken, line, charPositionInLine, msg, e);
 	}
 
-	private Consumer<Token> consumeTokenListener = null;
-	public void setConsumeTokenListener(Consumer<Token> listener) {
+	private BiConsumer<Token, ParseTree> consumeTokenListener = null;
+	public void setConsumeTokenListener(BiConsumer<Token, ParseTree>  listener) {
 		this.consumeTokenListener = listener;
 	}
-	private void listenConsumeToken(Token token) {
+	private void listenConsumeToken(Token token, ParseTree node) {
 		if (consumeTokenListener != null) {
-			consumeTokenListener.accept(token);
+			consumeTokenListener.accept(token, node);
 		}
 	}
 
@@ -609,9 +605,9 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 				}
 			}
 			else {
-				listenConsumeToken(o);
 				System.out.println("mode = consume ");
 				TerminalNode node = _ctx.addChild(createTerminalNode(_ctx,o));
+				listenConsumeToken(o, node);
 				if (_parseListeners != null) {
 					for (ParseTreeListener listener : _parseListeners) {
 						// inner class

@@ -2,7 +2,9 @@ package hmb.spring.serviceimpl;
 
 import hmb.antlr4.trans.AtnCreator;
 import hmb.antlr4.trans.EditTreeListener;
+import hmb.antlr4.trans.ToTreeNodeUtils;
 import hmb.protobuf.Request.*;
+import hmb.protobuf.Response;
 import hmb.protobuf.Response.*;
 import hmb.spring.config.MyServiceException;
 import hmb.utils.clazz.ObjectManager;
@@ -111,15 +113,16 @@ public class ParseService {
         });
     }
 
-    private static void addListeners(Parser parser, MainResponse.Builder mainResponseBuilder, Vocabulary lexerVocabulary) {
-        parser.setConsumeTokenListener(token -> {
+    private static void addListeners(Parser parser, MainResponse.Builder mainResponseBuilder, ToTreeNodeUtils toTreeNodeUtils) {
+        parser.setConsumeTokenListener((token, node) -> {
             var operation = ConsumeTokenOperation.newBuilder()
                     .setTokenConsumed(TokenMsg.newBuilder()
                             .setTokenType(token.getType())
-                            .setTokenRule(lexerVocabulary.getSymbolicName(token.getType()))
+                            .setTokenRule(toTreeNodeUtils.lexerVocabulary().getSymbolicName(token.getType()))
                             .setTokenText(token.getText())
                             .setChannel(token.getChannel())
                             .build())
+                    .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(node, node)))
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
@@ -233,10 +236,16 @@ public class ParseService {
             var parserATN = parserAtnCreator.getATNs();
             var parserMapper = parserAtnCreator.getMapper();
 
+            ToTreeNodeUtils toTreeNodeUtils = new ToTreeNodeUtils(lexer.get().getVocabulary(), parser.get().getRuleNames());
+
             // 添加parser监听
             addListeners(parser.get().getInterpreter(), mainResponseBuilder, parserMapper);
-            addListeners(parser.get(), mainResponseBuilder, lexer.get().getVocabulary());
-            parser.get().addParseListener(new EditTreeListener(mainResponseBuilder, lexer.get().getVocabulary(), parser.get().getRuleNames()));
+            addListeners(parser.get(), mainResponseBuilder, toTreeNodeUtils);
+
+            // 生成树
+            parser.get().addParseListener(new EditTreeListener(mainResponseBuilder, toTreeNodeUtils));
+
+
             parser.get().setErrorHandler(new BailErrorStrategy());
             ParserRuleContext program = parser.invokeMemberMethod("program", new Class[0]);
 

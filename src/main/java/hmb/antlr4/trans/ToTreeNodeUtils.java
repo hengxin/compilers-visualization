@@ -9,18 +9,11 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.awt.*;
 
-public class ToTreeNodeUtils {
+public record ToTreeNodeUtils(Vocabulary lexerVocabulary, String[] parserRuleNames) {
 
 
     private static final Color highlightColor = new Color(16, 96, 254);
-    private static final String highlightColorString = String.format("rgb(%d,%d,%d)", highlightColor.getRed(),highlightColor.getGreen(), highlightColor.getBlue());
-    private final Vocabulary lexerVocabulary;
-    private final String[] parserRuleNames;
-
-    public ToTreeNodeUtils(Vocabulary lexerVocabulary, String[] parserRuleNames) {
-        this.lexerVocabulary = lexerVocabulary;
-        this.parserRuleNames = parserRuleNames;
-    }
+    private static final String highlightColorString = String.format("rgb(%d,%d,%d)", highlightColor.getRed(), highlightColor.getGreen(), highlightColor.getBlue());
 
 
     public TreeNode toTree(ParseTree parseTree, ParseTree highlight) {
