@@ -60,6 +60,7 @@ let operatorIndex_ = 0;
 let operationList_: proto.IOperationWrapper[] = [];
 
 let currentTokenIndex_ = 0;
+let tryPredictTokenIndex_ = 0;
 let tokenList_: proto.ITokenMsg[] = [];
 
 function _setOptionList(list: proto.ISubAugmentedTransitionNetwork[]) {
@@ -103,7 +104,6 @@ export default function setMainResponse(resp: proto.MainResponse): boolean {
     operationList_ = resp.operation;
   }
   {
-    currentTokenIndex_ = 0;
     setTokenList(resp.token);
   }
 
@@ -155,20 +155,34 @@ export function getTokenList(): proto.ITokenMsg[] {
 
 function resetTokenColor(): void {
   tokenList_.forEach(token => (token.background = "rgb(255, 255, 255)"));
+  for (let i = 0; i < currentTokenIndex_; i++) {
+    tokenList_[i].background = visitedTokenColor;
+  }
+  if (currentTokenIndex_ < tokenList_.length) {
+    tokenList_[currentTokenIndex_].background = currentIndexTokenColor;
+  }
+  for (let i = currentTokenIndex_; i < tryPredictTokenIndex_; i++) {
+    tokenList_[i].background = tryAdaptivePredictColor;
+  }
 }
 
 function setTokenList(list: proto.ITokenMsg[]): void {
   tokenList_ = list;
+  currentTokenIndex_ = 0;
+  tryPredictTokenIndex_ = 0;
   resetTokenColor();
 }
 
 export function listenTokenList(list: proto.ITokenMsg[]): void {
-  currentTokenIndex_ = 0;
   setTokenList(list);
 }
 
 function nextToken(): void {
   currentTokenIndex_++;
+}
+
+function adaptivePredict(): void {
+  tryPredictTokenIndex_++;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function,@typescript-eslint/no-unused-vars
@@ -248,6 +262,10 @@ const addNewEdgeToColor = "rgb(64, 0, 0)";
 const reuseFromColor = "rgb(168, 255, 0)";
 const reuseToColor = "rgb(255, 168, 0)";
 
+const currentIndexTokenColor = "rgb(0, 128, 255)";
+const visitedTokenColor = "rgb(192, 192, 192)";
+const tryAdaptivePredictColor = "rgb(0, 255, 255)";
+
 function resetDefaultColors() {
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
@@ -294,6 +312,8 @@ async function handleAddNewEdge(
 ): Promise<void> {
   console.log(operation);
   resetDefaultColors();
+  adaptivePredict();
+  resetTokenColor();
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
       if (operation.newEdge.from.atnState) {
@@ -325,6 +345,8 @@ async function handleReuseState(
   operation: proto.IReuseStateOperation
 ): Promise<void> {
   resetDefaultColors();
+  adaptivePredict();
+  resetTokenColor();
   console.log(operation);
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
@@ -359,6 +381,9 @@ function handleSwitchTable(operation: proto.ISwitchTableOperation): void {
 
 function handleConsumeToken(operation: proto.IConsumeTokenOperation): void {
   console.log(operation);
+  nextToken();
+  tryPredictTokenIndex_ = currentTokenIndex_;
+  resetTokenColor();
 }
 
 function handleEditTree(operation: proto.IEditTreeOperation): void {
@@ -367,6 +392,8 @@ function handleEditTree(operation: proto.IEditTreeOperation): void {
 
 function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
   console.log(operation);
+  tryPredictTokenIndex_ = currentTokenIndex_;
+  resetTokenColor();
 }
 async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
