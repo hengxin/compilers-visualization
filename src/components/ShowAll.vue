@@ -3,7 +3,7 @@
   <a-button
     @click="playbackCurrent"
     style="width: 30%; text-align: left"
-    :disable="currentOperationButtonDisable"
+    :loading="currentOperationButtonDisable"
   >
     当前操作: {{ currentOperationString }}
   </a-button>
