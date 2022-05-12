@@ -11,9 +11,16 @@ import java.awt.*;
 
 public record ToTreeNodeUtils(Vocabulary lexerVocabulary, String[] parserRuleNames) {
 
+    private static String makeColorString(Color c) {
+        return String.format("rgb(%d,%d,%d,%f)", c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha() / 255.0d);
+    }
 
-    private static final Color highlightColor = new Color(16, 96, 254);
-    private static final String highlightColorString = String.format("rgb(%d,%d,%d)", highlightColor.getRed(), highlightColor.getGreen(), highlightColor.getBlue());
+    private static final Color highlightColor = new Color(8, 32, 192);
+    private static final String highlightColorString = makeColorString(highlightColor);
+    private static final Color leafColor = new Color(0, 255, 0, 64);
+    private static final String leafColorString = makeColorString(leafColor);
+    private static final Color branchColor = new Color(224, 192, 0, 64);
+    private static final String branchColorString = makeColorString(branchColor);
 
 
     public TreeNode toTree(ParseTree parseTree, ParseTree highlight) {
@@ -43,6 +50,12 @@ public record ToTreeNodeUtils(Vocabulary lexerVocabulary, String[] parserRuleNam
             }
         }
         Response.ItemStyle.Builder itemStyle = Response.ItemStyle.newBuilder();
+        switch (parseTree) {
+            case ParserRuleContext ignored -> itemStyle.setColor(branchColorString);
+            case TerminalNode ignored -> itemStyle.setColor(leafColorString);
+            default -> {
+            }
+        }
         if (parseTree == highlight) {
             itemStyle.setColor(highlightColorString);
         }
