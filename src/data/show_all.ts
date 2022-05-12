@@ -52,7 +52,7 @@ const globalConstOption = {
   ]
 };
 
-let sleepTime_ = 200;
+let sleepTime_ = 250;
 
 let treeOption_ = {
   tooltip: {
@@ -94,7 +94,7 @@ let treeOption_ = {
           align: "left"
         }
       },
-      animationDurationUpdate: sleepTime_
+      animationDurationUpdate: 500
     }
   ]
 };

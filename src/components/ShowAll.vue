@@ -48,7 +48,7 @@
         <v-chart
           class="chart"
           :option="treeData"
-          style="height: 400%; width: 100%"
+          style="height: 270%; width: 100%"
         />
       </a-card>
     </a-col>
