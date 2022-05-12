@@ -165,6 +165,7 @@ message SwitchTableOperation {
 }
 message ConsumeTokenOperation {
   required TokenMsg tokenConsumed = 1;
+  required ParserState parserState = 2;  // Parser: consume token 过后必定会触发 visitTerminalNode
 }
 message EditTreeOperation {
   required ParserState parserState = 1;

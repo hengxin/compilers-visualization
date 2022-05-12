@@ -106,6 +106,12 @@ export function listenTreeOption(list: any): void {
   console.log(treeOption_);
 }
 
+function setTreeData(root: proto.ITreeNode): void {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  treeOption_.series[0].data = [root];
+}
+
 let succeed_ = false;
 let initState_: proto.IInitialState;
 let globalOptionList_: any[] = [];
@@ -441,16 +447,13 @@ function handleConsumeToken(operation: proto.IConsumeTokenOperation): void {
   nextToken();
   tryPredictTokenIndex_ = currentTokenIndex_;
   resetTokenColor();
+  setTreeData(operation.parserState.root);
 }
 
 function handleEditTree(operation: proto.IEditTreeOperation): void {
   console.log(operation);
   console.log(treeOption_.series[0].data);
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  treeOption_.series[0].data = [operation.parserState.root];
-  console.log(treeOption_.series[0].data);
+  setTreeData(operation.parserState.root);
 }
 
 function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
