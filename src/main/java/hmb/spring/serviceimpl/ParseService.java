@@ -122,7 +122,7 @@ public class ParseService {
                             .setTokenText(token.getText())
                             .setChannel(token.getChannel())
                             .build())
-                    .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(node, node)))
+                    .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(node, node.getParent())))
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
