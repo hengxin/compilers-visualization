@@ -27,17 +27,17 @@
         <a-textarea
           v-model:value="lexer"
           placeholder="g4 lexer grammar"
-          :rows="13"
+          rows="13"
         />
         <a-textarea
           v-model:value="parser"
           placeholder="g4 parser grammar"
-          :rows="13"
+          rows="13"
         />
       </a-col>
       <a-col span="2" />
       <a-col :span="11">
-        <a-textarea v-model:value="code" placeholder="code" :rows="27" />
+        <a-textarea v-model:value="code" placeholder="code" rows="27" />
       </a-col>
     </a-row>
   </div>

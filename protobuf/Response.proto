@@ -169,6 +169,7 @@ message ConsumeTokenOperation {
 }
 message EditTreeOperation {
   required ParserState parserState = 1;
+  required string type = 2;
 }
 message EndAdaptiveOperation {
   required int32 alt = 1;
