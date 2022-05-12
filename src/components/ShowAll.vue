@@ -1,6 +1,10 @@
 <template>
   <a-button @click="debug">debug</a-button>
-  <a-button style="width: 30%; text-align: left">
+  <a-button
+    @click="playbackCurrent"
+    style="width: 30%; text-align: left"
+    :disable="currentOperationButtonDisable"
+  >
     当前操作: {{ currentOperationString }}
   </a-button>
   <a-button @click="next" type="primary" style="width: 30%; text-align: left">
@@ -56,7 +60,10 @@ import {
   listenTokenList,
   getTreeOption,
   listenTreeOption,
-  setNextButtonStringOnChanged
+  setNextButtonStringOnChanged,
+  reload,
+  getOperatorIndex,
+  playbackAllOperations
 } from "@/data/show_all";
 import { input } from "@/router";
 
@@ -97,6 +104,7 @@ export default {
       ],
       treeData: getTreeOption(),
       currentOperationString: "",
+      currentOperationButtonDisable: false,
       nextOperationString: "next"
     };
   },
@@ -119,6 +127,15 @@ export default {
       ++this.num;
       debug(this.num);
       this.init();
+    },
+    playbackCurrent() {
+      this.currentOperationButtonDisable = true;
+      const index = getOperatorIndex();
+      reload();
+      this.init();
+      playbackAllOperations(index - 1).then(() => {
+        this.currentOperationButtonDisable = false;
+      });
     },
     next() {
       nextOperation().then();

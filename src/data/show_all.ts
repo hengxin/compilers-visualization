@@ -52,6 +52,8 @@ const globalConstOption = {
   ]
 };
 
+let sleepTime_ = 200;
+
 let treeOption_ = {
   tooltip: {
     trigger: "item",
@@ -92,7 +94,7 @@ let treeOption_ = {
           align: "left"
         }
       },
-      animationDurationUpdate: 200
+      animationDurationUpdate: sleepTime_
     }
   ]
 };
@@ -123,6 +125,10 @@ let operationList_: proto.IOperationWrapper[] = [];
 let currentTokenIndex_ = 0;
 let tryPredictTokenIndex_ = 0;
 let tokenList_: proto.ITokenMsg[] = [];
+
+export function getOperatorIndex(): number {
+  return operatorIndex_;
+}
 
 function setOptionList_(list: proto.ISubAugmentedTransitionNetwork[]) {
   globalOptionList_ = []; //必须要清空，否则会元素重复
@@ -359,6 +365,22 @@ export function debug(num: number): void {
   reload();
 }
 
+export async function playbackAllOperations(times: number): Promise<void> {
+  const sleepTime = sleepTime_;
+  const animationDurationUpdate = treeOption_.series[0].animationDurationUpdate;
+  {
+    sleepTime_ = 0;
+    treeOption_.series[0].animationDurationUpdate = 1; // 严禁为0，原因不明
+  }
+  for (let i = 0; i < times; i++) {
+    await nextOperation();
+  }
+  {
+    sleepTime_ = sleepTime;
+    treeOption_.series[0].animationDurationUpdate = animationDurationUpdate;
+  }
+}
+
 export async function nextOperation(): Promise<void> {
   if (operatorIndex_ >= operationList_.length) {
     message.success("finished").then();
@@ -494,7 +516,7 @@ async function handleAddNewEdge(
       }
     }
   }
-  await sleep(200);
+  await sleep(sleepTime_);
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
       if (operation.newEdge.to.atnState) {
@@ -528,7 +550,7 @@ async function handleReuseState(
       }
     }
   }
-  await sleep(200);
+  await sleep(sleepTime_);
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
       if (operation.reuse.to.atnState) {
@@ -566,6 +588,6 @@ function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
   tryPredictTokenIndex_ = currentTokenIndex_;
   resetTokenColor();
 }
-async function sleep(ms: number): Promise<void> {
+export async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
