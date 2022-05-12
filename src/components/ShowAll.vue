@@ -1,7 +1,11 @@
 <template>
-  <a-button @click="back">back</a-button>
   <a-button @click="debug">debug</a-button>
-  <a-button @click="next" type="primary">next</a-button>
+  <a-button style="width: 30%; text-align: left">
+    当前操作: {{ currentOperationString }}
+  </a-button>
+  <a-button @click="next" type="primary" style="width: 30%; text-align: left">
+    {{ nextOperationButtonString }}
+  </a-button>
   <br />
   <div v-for="(token, idx) in tokenList" :key="idx" style="display: inline">
     <div
@@ -51,7 +55,8 @@ import {
   getTokenList,
   listenTokenList,
   getTreeOption,
-  listenTreeOption
+  listenTreeOption,
+  setNextButtonStringOnChanged
 } from "@/data/show_all";
 import { input } from "@/router";
 
@@ -80,6 +85,12 @@ export default {
       listenTokenList(this.tokenList);
       this.treeData = getTreeOption();
       listenTreeOption(this.treeData);
+      this.nextOperationString = "next";
+      setNextButtonStringOnChanged(next => {
+        this.currentOperationString = this.nextOperationString;
+        this.nextOperationString = next;
+      });
+      this.currentOperationString = "";
     }
   },
   data() {
@@ -95,19 +106,27 @@ export default {
           background: "rgb(255,255,255)"
         }
       ],
-      treeData: getTreeOption()
+      treeData: getTreeOption(),
+      currentOperationString: "",
+      nextOperationString: "next"
     };
   },
   methods: {
-    back() {
-      input();
-    },
     debug() {
       ++this.num;
       debug(this.num);
     },
     next() {
       nextOperation().then();
+    }
+  },
+  computed: {
+    nextOperationButtonString() {
+      if (this.nextOperationString) {
+        return "next: " + this.nextOperationString;
+      } else {
+        return "Finished";
+      }
     }
   }
 };

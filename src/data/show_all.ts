@@ -138,7 +138,7 @@ function _setOptionList(list: proto.ISubAugmentedTransitionNetwork[]) {
       if (data.source === undefined || data.target == undefined) {
         return data.name;
       } else {
-        return "" + data.source + " - " + data.name + " → " + data.target;
+        return "" + data.source + " — " + data.name + " → " + data.target;
       }
     };
     globalOptionList_.push(option);
@@ -211,6 +211,93 @@ export function listenOptionList(optionList: any[]): void {
   resetDefaultColors();
 }
 
+// eslint-disable-next-line
+let nextButtonStringOnChanged = (next: string) => {};
+export function setNextButtonStringOnChanged(func: (s: string) => void): void {
+  nextButtonStringOnChanged = func;
+  changeNextButtonString();
+}
+function changeNextButtonString(): void {
+  if (operatorIndex_ < operationList_.length) {
+    nextButtonStringOnChanged(
+      getNextOperationString(operationList_[operatorIndex_])
+    );
+  } else {
+    nextButtonStringOnChanged("");
+  }
+}
+function getNextOperationString(operation: proto.IOperationWrapper): string {
+  switch (operation.operationType) {
+    case proto.OperationType.StartStateClosure:
+      if (operation.startStateClosureOperation) {
+        return "开始计算闭包";
+      }
+      break;
+    case proto.OperationType.AddNewDFAState:
+      if (operation.addNewDFAStateOperation) {
+        return (
+          "添加DFA新状态 " +
+          operation.addNewDFAStateOperation.newDfaState.dfaStateNumber
+        );
+      }
+      break;
+    case proto.OperationType.AddNewEdge:
+      if (operation.addNewEdgeOperation) {
+        return (
+          "添加DFA状态边 " +
+          operation.addNewEdgeOperation.newEdge.from.dfaStateNumber +
+          " — " +
+          operation.addNewEdgeOperation.newEdge.upon +
+          " → " +
+          operation.addNewEdgeOperation.newEdge.to.dfaStateNumber
+        );
+      }
+      break;
+    case proto.OperationType.ReuseState:
+      if (operation.reuseStateOperation) {
+        return (
+          "命中DFA缓存 " +
+          operation.reuseStateOperation.reuse.from.dfaStateNumber +
+          " — " +
+          operation.reuseStateOperation.reuse.upon +
+          " → " +
+          operation.reuseStateOperation.reuse.to.dfaStateNumber
+        );
+      }
+      break;
+    case proto.OperationType.SwitchTable:
+      if (operation.switchTableOperation) {
+        return "SwitchTable";
+      }
+      break;
+    case proto.OperationType.ConsumeToken:
+      if (operation.consumeTokenOperation) {
+        return (
+          "消耗当前token " +
+          operation.consumeTokenOperation.tokenConsumed.tokenText
+        );
+      }
+      break;
+    case proto.OperationType.EditTree:
+      if (operation.editTreeOperation) {
+        return operation.editTreeOperation.type;
+      }
+      break;
+    case proto.OperationType.EndAdaptive:
+      if (operation.endAdaptiveOperation) {
+        return (
+          "成功自适应预测，选择第" +
+          operation.endAdaptiveOperation.alt +
+          "个分支"
+        );
+      }
+      break;
+    default:
+      return "Unknown Type " + operation.operationType;
+  }
+  return "Error " + operation.operationType;
+}
+
 export function getTokenList(): proto.ITokenMsg[] {
   check();
   return tokenList_;
@@ -257,6 +344,7 @@ export async function nextOperation(): Promise<void> {
   } else {
     const operation = operationList_[operatorIndex_];
     operatorIndex_++;
+    changeNextButtonString();
     switch (operation.operationType) {
       case proto.OperationType.StartStateClosure:
         if (operation.startStateClosureOperation) {
@@ -284,28 +372,24 @@ export async function nextOperation(): Promise<void> {
         break;
       case proto.OperationType.SwitchTable:
         if (operation.switchTableOperation) {
-          message.success("switchTable");
           handleSwitchTable(operation.switchTableOperation);
           return;
         }
         break;
       case proto.OperationType.ConsumeToken:
         if (operation.consumeTokenOperation) {
-          message.success("ConsumeToken");
           handleConsumeToken(operation.consumeTokenOperation);
           return;
         }
         break;
       case proto.OperationType.EditTree:
         if (operation.editTreeOperation) {
-          message.success("EditTree");
           handleEditTree(operation.editTreeOperation);
           return;
         }
         break;
       case proto.OperationType.EndAdaptive:
         if (operation.endAdaptiveOperation) {
-          message.success("EndAdaptivePredict");
           handleEndAdaptive(operation.endAdaptiveOperation);
           return;
         }
