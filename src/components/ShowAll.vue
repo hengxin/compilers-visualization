@@ -1,7 +1,17 @@
 <template>
+  <a-dropdown :trigger="['click']">
+    <a @click.prevent>操作序列 </a>
+    <template #overlay>
+      <a-menu @click="onMenuClick">
+        <a-menu-item v-for="(s, idx) in operationStringList" :key="idx">
+          <span>{{ idx }}: {{ s }}</span>
+        </a-menu-item>
+      </a-menu>
+    </template>
+  </a-dropdown>
   <a-button @click="debug">debug</a-button>
   <a-button
-    @click="playbackCurrent"
+    @click="playbackOnce"
     style="width: 30%; text-align: left"
     :loading="currentOperationButtonDisable"
   >
@@ -46,7 +56,16 @@
 </template>
 
 <script>
-import { Button, Card, Row, Col, message } from "ant-design-vue";
+import {
+  Button,
+  Card,
+  Row,
+  Col,
+  Dropdown,
+  Menu,
+  MenuItem,
+  message
+} from "ant-design-vue";
 import VChart from "vue-echarts";
 
 import {
@@ -74,7 +93,10 @@ export default {
     AButton: Button,
     ACard: Card,
     ARow: Row,
-    ACol: Col
+    ACol: Col,
+    ADropdown: Dropdown,
+    AMenu: Menu,
+    AMenuItem: MenuItem
   },
   beforeCreate() {
     if (!loaded()) {
@@ -105,7 +127,8 @@ export default {
       treeData: getTreeOption(),
       currentOperationString: "",
       currentOperationButtonDisable: false,
-      nextOperationString: "next"
+      nextOperationString: "next",
+      operationStringList: []
     };
   },
   methods: {
@@ -120,25 +143,33 @@ export default {
       setNextButtonStringOnChanged(next => {
         this.currentOperationString = this.nextOperationString;
         this.nextOperationString = next;
+        this.operationStringList.push(this.currentOperationString);
       });
       this.currentOperationString = "";
+      this.operationStringList.length = 0;
     },
     debug() {
       ++this.num;
       debug(this.num);
       this.init();
     },
-    playbackCurrent() {
+    playbackOnce() {
       this.currentOperationButtonDisable = true;
       const index = getOperatorIndex();
+      this.playbackTo(index - 1);
+    },
+    playbackTo(index) {
       reload();
       this.init();
-      playbackAllOperations(index - 1).then(() => {
+      playbackAllOperations(index).then(() => {
         this.currentOperationButtonDisable = false;
       });
     },
     next() {
       nextOperation().then();
+    },
+    onMenuClick(item) {
+      this.playbackTo(item.key);
     }
   },
   computed: {
