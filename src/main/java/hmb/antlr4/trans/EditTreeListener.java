@@ -28,7 +28,7 @@ public class EditTreeListener implements ParseTreeListener {
     public void visitTerminal(TerminalNode node) {
         builder.addOperation(
                 OperationCreator.makeOperation(Response.EditTreeOperation.newBuilder()
-                        .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(node)))
+                        .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(node, node)))
                         .build())
         );
     }
@@ -37,7 +37,7 @@ public class EditTreeListener implements ParseTreeListener {
     public void enterEveryRule(ParserRuleContext ctx) {
         builder.addOperation(
                 OperationCreator.makeOperation(Response.EditTreeOperation.newBuilder()
-                        .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(ctx)))
+                        .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(ctx, ctx)))
                         .build())
         );
     }
@@ -46,7 +46,7 @@ public class EditTreeListener implements ParseTreeListener {
     public void exitEveryRule(ParserRuleContext ctx) {
         builder.addOperation(
                 OperationCreator.makeOperation(Response.EditTreeOperation.newBuilder()
-                        .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(ctx)))
+                        .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(ctx, ctx.parent)))
                         .build())
         );
     }
