@@ -57,7 +57,8 @@ let sleepTime_ = 250;
 let treeOption_ = {
   tooltip: {
     trigger: "item",
-    triggerOn: "mousemove"
+    triggerOn: "mousemove",
+    formatter: undefined
   },
   series: [
     {
@@ -89,7 +90,7 @@ let treeOption_ = {
       leaves: {
         label: {
           position: "bottom",
-          rotate: -90,
+          rotate: 0,
           verticalAlign: "middle",
           align: "left"
         }
@@ -102,9 +103,29 @@ let treeOption_ = {
 export function getTreeOption(): any {
   return treeOption_;
 }
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function listenTreeOption(list: any): void {
   treeOption_ = list;
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  treeOption_.tooltip.formatter = (v: any) => {
+    let res = "";
+    for (let i = 0; i < v.treeAncestors.length - 1; i++) {
+      const ancestor = v.treeAncestors[i];
+      if (ancestor.name) {
+        res += ancestor.name;
+        res += ".";
+      }
+    }
+    if (v.data.val) {
+      res += v.data.val;
+    } else {
+      res += v.data.name;
+    }
+    return res;
+  };
   console.log(treeOption_);
 }
 
@@ -286,10 +307,12 @@ export function listenOptionList(optionList: any[]): void {
 
 // eslint-disable-next-line
 let nextButtonStringOnChanged = (next: string) => {};
+
 export function setNextButtonStringOnChanged(func: (s: string) => void): void {
   nextButtonStringOnChanged = func;
   changeNextButtonString();
 }
+
 function changeNextButtonString(): void {
   if (operatorIndex_ < operationList_.length) {
     nextButtonStringOnChanged(
@@ -299,6 +322,7 @@ function changeNextButtonString(): void {
     nextButtonStringOnChanged("");
   }
 }
+
 function getNextOperationString(operation: proto.IOperationWrapper): string {
   switch (operation.operationType) {
     case proto.OperationType.StartStateClosure:
@@ -526,6 +550,7 @@ function handleStartStates(operation: proto.IStartStateClosureOperation): void {
     }
   }
 }
+
 function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
   console.log(operation);
   resetDefaultColors();
@@ -649,6 +674,7 @@ function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
   tryPredictTokenIndex_ = currentTokenIndex_;
   resetTokenColor();
 }
+
 export async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
