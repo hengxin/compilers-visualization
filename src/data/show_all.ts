@@ -515,10 +515,11 @@ export async function nextOperation(): Promise<void> {
 }
 
 const defaultColor = "rgb(0,0,192)";
-const startStatesColor = "rgb(128, 128, 255)";
+const newPredictColor = "rgb(192, 32, 32)";
+const startStatesColor = "rgb(192, 192, 255)";
 const addNewDFAStateColor = "rgb(0, 255, 255)";
 const addNewEdgeFromColor = "rgb(255, 0, 0)";
-const addNewEdgeToColor = "rgb(64, 0, 0)";
+const addNewEdgeToColor = "rgb(0, 255, 0)";
 const reuseFromColor = "rgb(168, 255, 0)";
 const reuseToColor = "rgb(255, 168, 0)";
 
@@ -641,6 +642,15 @@ async function handleReuseState(
 
 function handleSwitchTable(operation: proto.ISwitchTableOperation): void {
   console.log(operation);
+  resetDefaultColors();
+  here: for (const op of globalOptionList_) {
+    for (const data of op.series[0].data) {
+      if (parseInt(data.id) === operation.startAtn.atnStateNumber) {
+        data.itemStyle.color = newPredictColor;
+        break here;
+      }
+    }
+  }
   dfaStateList_.length = 0;
   if (operation.dfaStates) {
     for (const dfaState of operation.dfaStates) {
@@ -673,6 +683,7 @@ function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
   console.log(operation);
   tryPredictTokenIndex_ = currentTokenIndex_;
   resetTokenColor();
+  resetDefaultColors();
 }
 
 export async function sleep(ms: number): Promise<void> {
