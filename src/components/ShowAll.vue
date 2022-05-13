@@ -10,9 +10,11 @@
         </a-menu>
       </template>
     </a-dropdown>
-    <a-button style="width: 15%; text-align: left">
-      <span> 当前状态: {{ currentStateString }} </span>
-    </a-button>
+    <a-input
+      style="width: 15%; background: white; color: black"
+      disabled="true"
+      v-model:value="currentStateString"
+    />
     <a-button
       @click="playbackOnce"
       style="
@@ -115,7 +117,8 @@ import {
   MenuItem,
   Table,
   TableColumn,
-  message
+  message,
+  Input
 } from "ant-design-vue";
 import VChart from "vue-echarts";
 
@@ -150,6 +153,7 @@ export default {
     ARow: Row,
     ACol: Col,
     ADropdown: Dropdown,
+    AInput: Input,
     AMenu: Menu,
     AMenuItem: MenuItem,
     ATable: Table,

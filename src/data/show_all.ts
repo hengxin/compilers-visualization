@@ -148,13 +148,14 @@ let currentTokenIndex_ = 0;
 let tryPredictTokenIndex_ = 0;
 let tokenList_: proto.ITokenMsg[] = [];
 
-let currentState_ = "";
 // 当前状态
+let currentDFAState_ = "";
+let currentNode_ = "";
 export function getCurrentState(): string {
   if (isInAdaptive_) {
-    return currentState_;
+    return "当前状态: " + currentDFAState_;
   } else {
-    return "";
+    return "当前节点: " + currentNode_;
   }
 }
 
@@ -269,7 +270,8 @@ function init_(resp: proto.MainResponse): boolean {
   }
   {
     isInAdaptive_ = false;
-    currentState_ = "";
+    currentDFAState_ = "";
+    currentNode_ = "";
   }
   return true;
 }
@@ -575,7 +577,7 @@ function handleStartStates(operation: proto.IStartStateClosureOperation): void {
 
 function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
   console.log(operation);
-  currentState_ = "s" + operation.newDfaState.dfaStateNumber;
+  currentDFAState_ = "s" + operation.newDfaState.dfaStateNumber;
   resetDefaultColors();
   pushDFA(operation.newDfaState);
   for (const op of globalOptionList_) {
@@ -596,7 +598,7 @@ async function handleAddNewEdge(
   operation: proto.IAddNewEdgeOperation
 ): Promise<void> {
   console.log(operation);
-  currentState_ = "s" + operation.newEdge.to.dfaStateNumber;
+  currentDFAState_ = "s" + operation.newEdge.to.dfaStateNumber;
   resetDefaultColors();
   adaptivePredict();
   resetTokenColor();
@@ -632,7 +634,7 @@ async function handleReuseState(
   operation: proto.IReuseStateOperation
 ): Promise<void> {
   console.log(operation);
-  currentState_ = "s" + operation.reuse.to.dfaStateNumber;
+  currentDFAState_ = "s" + operation.reuse.to.dfaStateNumber;
   resetDefaultColors();
   adaptivePredict();
   resetTokenColor();
@@ -667,7 +669,7 @@ async function handleReuseState(
 function handleSwitchTable(operation: proto.ISwitchTableOperation): void {
   console.log(operation);
   isInAdaptive_ = true;
-  currentState_ = "" + operation.startAtn.atnStateNumber; // 都是从s0发起的
+  currentDFAState_ = "" + operation.startAtn.atnStateNumber; // 都是从s0发起的
   resetTokenColor();
   resetDefaultColors();
   here: for (const op of globalOptionList_) {
@@ -704,6 +706,7 @@ function handleEditTree(operation: proto.IEditTreeOperation): void {
   console.log(operation);
   console.log(treeOption_.series[0].data);
   setTreeData(operation.parserState.root);
+  currentNode_ = operation.currentNode;
 }
 
 function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
@@ -712,7 +715,7 @@ function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
   tryPredictTokenIndex_ = currentTokenIndex_;
   resetTokenColor();
   resetDefaultColors();
-  currentState_ = "";
+  currentDFAState_ = "";
 }
 
 export async function sleep(ms: number): Promise<void> {

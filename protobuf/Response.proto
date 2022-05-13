@@ -171,7 +171,8 @@ message ConsumeTokenOperation {
 }
 message EditTreeOperation {
   required ParserState parserState = 1;
-  required string type = 2;
+  required string type = 2;  // 供前端打印，主要是push和pop
+  required string currentNode = 3;  // 当前位于哪个位置。因为栈顶都是非终结符，因此ConsumeToken时不需使用此条件
 }
 message EndAdaptiveOperation {
   required int32 alt = 1;
