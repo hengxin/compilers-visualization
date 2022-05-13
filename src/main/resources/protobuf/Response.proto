@@ -154,6 +154,7 @@ message StartStateClosureOperation {
 }
 message AddNewDFAStateOperation {
   required DFAStateMsg newDfaState = 1;
+  required bool isNew = 2;  // 可能抵达了某一条边，但之前已经进入过。这时候map.put是一个空操作
 }
 message AddNewEdgeOperation {
   required EdgeMsg newEdge = 1;

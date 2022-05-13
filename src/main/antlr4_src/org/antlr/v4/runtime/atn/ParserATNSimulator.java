@@ -2160,9 +2160,14 @@ public class ParserATNSimulator extends ATNSimulator {
 				D.configs.optimizeConfigs(this);
 				D.configs.setReadonly(true);
 			}
-			dfa.states.put(D, D);
+			if (D.equals(dfa.states.get(D))) {
+				// 相当于containsKey，但理论上这样更严谨一些
+				this.listenAddNewDFAState(D, false);
+			} else {
+				dfa.states.put(D, D);
+				this.listenAddNewDFAState(D, true);
+			}
 
-			this.listenAddNewDFAState(D);
 			if ( debug ) System.out.println("adding new DFA state: "+D);
 
 			return D;

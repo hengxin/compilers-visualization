@@ -38,13 +38,13 @@ public abstract class ATNSimulator {
 		}
 	}
 
-	private Consumer<DFAState> addNewDFAStateListener = null;
-	public void setAddNewDFAStateListener(Consumer<DFAState> listener) {
+	private BiConsumer<DFAState, Boolean> addNewDFAStateListener = null;
+	public void setAddNewDFAStateListener(BiConsumer<DFAState, Boolean> listener) {
 		this.addNewDFAStateListener = listener;
 	}
-	protected void listenAddNewDFAState(DFAState dfaState) {
+	protected void listenAddNewDFAState(DFAState dfaState, boolean isNew) {
 		if (addNewDFAStateListener != null) {
-			addNewDFAStateListener.accept(dfaState);
+			addNewDFAStateListener.accept(dfaState, isNew);
 		}
 	}
 

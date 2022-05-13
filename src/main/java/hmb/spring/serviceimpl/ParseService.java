@@ -62,10 +62,11 @@ public class ParseService {
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
-        atnSimulator.setAddNewDFAStateListener(dfaState -> {
+        atnSimulator.setAddNewDFAStateListener((dfaState, isNew) -> {
             var operation = AddNewDFAStateOperation
                     .newBuilder()
                     .setNewDfaState(OperationCreator.makeDFAState(dfaState, mapper))
+                    .setIsNew(isNew)
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
