@@ -349,6 +349,12 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
       break;
     case proto.OperationType.AddNewDFAState:
       if (operation.addNewDFAStateOperation) {
+        if (!operation.addNewDFAStateOperation.isNew) {
+          return (
+            "抵达已有DFA状态 s" +
+            operation.addNewDFAStateOperation.newDfaState.dfaStateNumber
+          );
+        }
         return (
           "添加DFA新状态 s" +
           operation.addNewDFAStateOperation.newDfaState.dfaStateNumber
@@ -579,7 +585,9 @@ function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
   console.log(operation);
   currentDFAState_ = "s" + operation.newDfaState.dfaStateNumber;
   resetDefaultColors();
-  pushDFA(operation.newDfaState);
+  if (operation.isNew) {
+    pushDFA(operation.newDfaState);
+  }
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
       if (operation.newDfaState.atnState) {
