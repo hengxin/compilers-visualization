@@ -3,6 +3,7 @@ package hmb.antlr4.trans;
 import hmb.protobuf.Response;
 import hmb.protobuf.Response.TreeNode;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.StringTools;
 import org.antlr.v4.runtime.Vocabulary;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -42,7 +43,10 @@ public record ToTreeNodeUtils(Vocabulary lexerVocabulary, String[] parserRuleNam
         TreeNode.Builder result = TreeNode.newBuilder();
         switch (parseTree) {
             case ParserRuleContext parserRuleContext -> result.setName(this.getName(parserRuleContext));
-            case TerminalNode terminalNode -> result.setName(this.getName(terminalNode));
+            case TerminalNode terminalNode -> {
+                result.setName(StringTools.replace(terminalNode.getText()));
+                result.setVal(this.getName(terminalNode));
+            }
             case null -> throw new NullPointerException("ParseTree");
             default -> {
                 result.setName("unknown");
