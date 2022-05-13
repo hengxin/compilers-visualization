@@ -364,7 +364,7 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
       break;
     case proto.OperationType.SwitchTable:
       if (operation.switchTableOperation) {
-        return "SwitchTable";
+        return "LL(1)无法判断，发起自适应预测算法";
       }
       break;
     case proto.OperationType.ConsumeToken:
