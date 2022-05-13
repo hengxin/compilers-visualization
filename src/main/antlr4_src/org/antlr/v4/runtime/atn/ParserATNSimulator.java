@@ -398,6 +398,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				}
 				// dfa.add(new DFA-State)
 			} else {
+				listenAddNewDFAState(s0, false);
 				if ( debug ) System.out.println("s0 is not null ");
 			}
 
@@ -2153,20 +2154,20 @@ public class ParserATNSimulator extends ATNSimulator {
 
 		synchronized (dfa.states) {
 			DFAState existing = dfa.states.get(D);
-			if ( existing!=null ) return existing;
+			if ( existing!=null ) {
+				this.listenAddNewDFAState(existing, false);
+				return existing;
+			}
 
 			D.stateNumber = dfa.states.size();
 			if (!D.configs.isReadonly()) {
 				D.configs.optimizeConfigs(this);
 				D.configs.setReadonly(true);
 			}
-			if (D.equals(dfa.states.get(D))) {
-				// 相当于containsKey，但理论上这样更严谨一些
-				this.listenAddNewDFAState(D, false);
-			} else {
-				dfa.states.put(D, D);
-				this.listenAddNewDFAState(D, true);
-			}
+
+			dfa.states.put(D, D);
+			this.listenAddNewDFAState(D, true);
+
 
 			if ( debug ) System.out.println("adding new DFA state: "+D);
 
