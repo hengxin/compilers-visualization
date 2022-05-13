@@ -1,38 +1,50 @@
 <template>
-  <a-dropdown :trigger="['click']">
-    <a @click.prevent>操作序列 </a>
-    <template #overlay>
-      <a-menu @click="onMenuClick">
-        <a-menu-item v-for="(s, idx) in operationStringList" :key="idx">
-          <span>{{ idx }}: {{ s }}</span>
-        </a-menu-item>
-      </a-menu>
-    </template>
-  </a-dropdown>
-  <a-button @click="debug">debug</a-button>
-  <a-button
-    @click="playbackOnce"
-    style="width: 30%; text-align: left"
-    :loading="currentOperationButtonDisable"
-  >
-    当前操作: {{ currentOperationString }}
-  </a-button>
-  <a-button @click="nextOp" type="primary" style="width: 30%; text-align: left">
-    {{ nextOperationButtonString }}
-  </a-button>
-  <br />
-  <div v-for="(token, idx) in tokenList" :key="idx" style="display: inline">
-    <div
-      style="border: 1px solid #c6c6c6; display: inline-block"
-      :style="'background: ' + token.background"
+  <a-affix :offset-top="top">
+    <a-dropdown :trigger="['click']">
+      <a @click.prevent>操作序列 </a>
+      <template #overlay>
+        <a-menu @click="onMenuClick">
+          <a-menu-item v-for="(s, idx) in operationStringList" :key="idx">
+            <span>{{ idx }}: {{ s }}</span>
+          </a-menu-item>
+        </a-menu>
+      </template>
+    </a-dropdown>
+    <a-button style="width: 10%; text-align: left"><span>debug</span></a-button>
+    <a-button
+      @click="playbackOnce"
+      style="
+        width: 30%;
+        text-align: left;
+        background: #dcffff;
+        font-weight: bold;
+      "
+      :loading="currentOperationButtonDisable"
     >
-      <div>
-        {{ token.tokenRule }}
-        <br />
-        {{ token.tokenText }}
+      当前操作: {{ currentOperationString }}
+    </a-button>
+    <a-button
+      @click="nextOp"
+      type="default"
+      style="width: 30%; text-align: left"
+    >
+      {{ nextOperationButtonString }}
+    </a-button>
+    <br />
+    <div v-for="(token, idx) in tokenList" :key="idx" style="display: inline">
+      <div
+        style="border: 1px solid #c6c6c6; display: inline-block"
+        :style="'background: ' + token.background"
+      >
+        <div>
+          {{ token.tokenRule }}
+          <br />
+          {{ token.tokenText }}
+        </div>
       </div>
     </div>
-  </div>
+  </a-affix>
+
   <a-row>
     <a-col :span="9">
       <a-card v-for="(op, idx) in optionList" :key="idx" ref="vAtnList">
@@ -44,7 +56,7 @@
       </a-card>
     </a-col>
     <a-col :span="15">
-      <a-card style="border: 1px solid rgba(0, 0, 0)">
+      <a-card style="border: 1px solid rgba(0, 0, 0); margin-top: 3%">
         <v-chart
           class="chart"
           :option="treeData"
@@ -91,6 +103,7 @@
 
 <script>
 import {
+  Affix,
   Button,
   Card,
   Row,
@@ -128,6 +141,7 @@ export default {
   name: "ShowAll",
   components: {
     VChart,
+    AAffix: Affix,
     AButton: Button,
     ACard: Card,
     ARow: Row,
