@@ -346,7 +346,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		int index = _startIndex;
 
 		List<DFAState> dfaStates = new ArrayList<>(dfa.states.keySet());
-		this.listenSwitchTable(dfaStates, dfa.edges, dfa.atnStartState);
+		this.listenSwitchTable(dfaStates, dfa.edges, dfa.atnStartState, decision);
 
 		// Now we are certain to have a specific decision's DFA
 		// But, do we still need an initial state?

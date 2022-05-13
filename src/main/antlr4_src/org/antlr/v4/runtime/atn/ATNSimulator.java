@@ -10,7 +10,6 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Triple;
-import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -26,6 +25,14 @@ public abstract class ATNSimulator {
 	public static final int SERIALIZED_VERSION;
 	static {
 		SERIALIZED_VERSION = ATNDeserializer.SERIALIZED_VERSION;
+	}
+
+	public interface TriConsumer<K, V, S> {
+		void accept(K k, V v, S s);
+	}
+
+	public interface QuadrupleConsumer<A, B, C, D> {
+		void accept(A a, B b, C c, D d);
 	}
 
 	private Consumer<DFAState> startStateClosureListener = null;
@@ -68,15 +75,15 @@ public abstract class ATNSimulator {
 		}
 	}
 
-	private TriConsumer<List<DFAState>, List<Triple<DFAState, DFAState, String>>, ATNState> switchTableListener = null;
+	private QuadrupleConsumer<List<DFAState>, List<Triple<DFAState, DFAState, String>>, ATNState, Integer> switchTableListener = null;
 
 	// 两个list需要深拷贝
-	public void setSwitchTableListener(TriConsumer<List<DFAState>, List<Triple<DFAState, DFAState, String>>, ATNState> listener) {
+	public void setSwitchTableListener(QuadrupleConsumer<List<DFAState>, List<Triple<DFAState, DFAState, String>>, ATNState, Integer> listener) {
 		this.switchTableListener = listener;
 	}
-	protected void listenSwitchTable(List<DFAState> dfaStates, List<Triple<DFAState, DFAState, String>> edges, ATNState startAtn) {
+	protected void listenSwitchTable(List<DFAState> dfaStates, List<Triple<DFAState, DFAState, String>> edges, ATNState startAtn, int decision) {
 		if (switchTableListener != null) {
-			switchTableListener.accept(dfaStates, edges, startAtn);
+			switchTableListener.accept(dfaStates, edges, startAtn, decision);
 		}
 	}
 

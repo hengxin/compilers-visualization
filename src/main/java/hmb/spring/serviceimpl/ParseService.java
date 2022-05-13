@@ -92,7 +92,7 @@ public class ParseService {
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
-        atnSimulator.setSwitchTableListener((dfaStateList, edgeList, startAtn) -> {
+        atnSimulator.setSwitchTableListener((dfaStateList, edgeList, startAtn, decision) -> {
             var operation = SwitchTableOperation
                     .newBuilder()
                     .addAllDfaStates(dfaStateList.stream().map(
@@ -106,6 +106,7 @@ public class ParseService {
                                     .build()
                     ).toList())
                     .setStartAtn(OperationCreator.makeATNState(new ATNConfig(startAtn, -1, new EmptyPredictionContext()), mapper))
+                    .setDecision(decision)
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
