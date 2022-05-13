@@ -12,7 +12,7 @@
     </a-dropdown>
     <a-input
       style="width: 15%; background: white; color: black"
-      disabled="true"
+      :disabled="true"
       v-model:value="currentStateString"
     />
     <a-button
