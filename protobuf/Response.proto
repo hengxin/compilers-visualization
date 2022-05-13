@@ -25,6 +25,7 @@ message Label {
 
 message LineStyle {
   optional double curveness = 1 [default = 0];  // 前端已经全局设置 autoCurveness: true
+  optional string color = 2;
 }
 
 message AtnLink {
