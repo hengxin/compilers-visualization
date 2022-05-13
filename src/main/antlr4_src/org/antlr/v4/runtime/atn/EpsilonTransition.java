@@ -8,6 +8,7 @@ package org.antlr.v4.runtime.atn;
 
 public final class EpsilonTransition extends Transition {
 
+	public static final String epsilon = "ε";
 	private final int outermostPrecedenceReturn;
 
 	public EpsilonTransition(ATNState target) {
@@ -47,6 +48,6 @@ public final class EpsilonTransition extends Transition {
 	@Override
 
 	public String toString() {
-		return "ε";
+		return epsilon;
 	}
 }

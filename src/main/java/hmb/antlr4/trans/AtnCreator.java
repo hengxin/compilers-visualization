@@ -9,6 +9,8 @@ import org.antlr.v4.runtime.atn.*;
 
 import java.util.*;
 
+import static org.antlr.v4.runtime.atn.EpsilonTransition.epsilon;
+
 public class AtnCreator {
 
     private static <T> T getOrDefault(Map<T, T> map, T t) {
@@ -100,6 +102,14 @@ public class AtnCreator {
                         case null -> throw new RuntimeException("transition");
                     };
 
+                    String lineStyleColor = switch (transition) {
+                        case RuleTransition ignore -> "rgba(255,0,0,0.3)";
+                        case EpsilonTransition ignore -> "rgba(0,0,0,0.19)";
+                        case ActionTransition ignore -> "rgba(0,0,0,0.20)";
+                        case Object ignore && epsilon.equals(transitionString) -> "rgba(0,0,0,0.21)";
+                        case default -> "rgba(0,255,0,0.3)";
+                    };
+
 
                     // 如果 A--t1-->B, B--t2-->A，则这两段都需要弯曲
                     final boolean isLoop = sourceToTarget.getOrDefault(triple.second(), Collections.emptySet()).contains(triple.first());
@@ -144,7 +154,9 @@ public class AtnCreator {
 //                                            .setFormatter(transitionString)
                                             .setLineHeight(Label.getDefaultInstance().getLineHeight())
                                             .build())
-                                    .setLineStyle(LineStyle.newBuilder().build())
+                                    .setLineStyle(LineStyle.newBuilder()
+                                            .setColor(lineStyleColor)
+                                            .build())
                                     .build()
                     );
 //                    System.out.println(triple.first() + " --    " + transitionString + "    --> " + triple.second());
