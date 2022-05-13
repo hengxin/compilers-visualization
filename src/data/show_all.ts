@@ -156,7 +156,7 @@ export function getOperatorIndex(): number {
 }
 
 function setOptionList_(list: proto.ISubAugmentedTransitionNetwork[]) {
-  globalOptionList_ = []; //必须要清空，否则会元素重复
+  globalOptionList_.length = 0; //必须要清空，否则会元素重复
   for (const subATNElement of list) {
     const option = JSON.parse(JSON.stringify(globalConstOption));
     option.title.text = subATNElement.ruleName;
@@ -251,7 +251,7 @@ function init_(resp: proto.MainResponse): boolean {
     setTokenList(resp.token);
   }
   {
-    treeOption_.series[0].data = [];
+    treeOption_.series[0].data.length = 0;
   }
   {
     dfaStateList_.length = 0;
