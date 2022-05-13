@@ -345,6 +345,9 @@ public class ParserATNSimulator extends ATNSimulator {
 		int m = input.mark();
 		int index = _startIndex;
 
+		List<DFAState> dfaStates = new ArrayList<>(dfa.states.keySet());
+		this.listenSwitchTable(dfaStates, dfa.edges);
+
 		// Now we are certain to have a specific decision's DFA
 		// But, do we still need an initial state?
 		try {
@@ -398,8 +401,7 @@ public class ParserATNSimulator extends ATNSimulator {
 				if ( debug ) System.out.println("s0 is not null ");
 			}
 
-			List<DFAState> dfaStates = new ArrayList<>(dfa.states.keySet());
-			this.listenSwitchTable(dfaStates, dfa.edges);
+
 
 			int alt = execATN(dfa, s0, input, index, outerContext);
 			this.listenEndAdaptive(alt);
