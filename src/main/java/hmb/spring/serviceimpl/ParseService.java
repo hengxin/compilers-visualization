@@ -10,8 +10,10 @@ import hmb.spring.config.MyServiceException;
 import hmb.utils.clazz.ObjectManager;
 import hmb.utils.tools.OperationCreator;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.EmptyPredictionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -89,7 +91,7 @@ public class ParseService {
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
-        atnSimulator.setSwitchTableListener((dfaStateList, edgeList) -> {
+        atnSimulator.setSwitchTableListener((dfaStateList, edgeList, startAtn) -> {
             var operation = SwitchTableOperation
                     .newBuilder()
                     .addAllDfaStates(dfaStateList.stream().map(
@@ -102,6 +104,7 @@ public class ParseService {
                                     .setUpon(e.c)
                                     .build()
                     ).toList())
+                    .setStartAtn(OperationCreator.makeATNState(new ATNConfig(startAtn, -1, new EmptyPredictionContext()), mapper))
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });

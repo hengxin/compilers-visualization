@@ -163,6 +163,7 @@ message ReuseStateOperation {
 message SwitchTableOperation {
   repeated DFAStateMsg dfaStates = 1;
   repeated EdgeMsg edges = 2;
+  required AtnStateMsg startAtn = 3;
 }
 message ConsumeTokenOperation {
   required TokenMsg tokenConsumed = 1;

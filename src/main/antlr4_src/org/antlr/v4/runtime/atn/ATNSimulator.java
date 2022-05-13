@@ -68,15 +68,15 @@ public abstract class ATNSimulator {
 		}
 	}
 
-	private BiConsumer<List<DFAState>, List<Triple<DFAState, DFAState, String>>> switchTableListener = null;
+	private TriConsumer<List<DFAState>, List<Triple<DFAState, DFAState, String>>, ATNState> switchTableListener = null;
 
 	// 两个list需要深拷贝
-	public void setSwitchTableListener(BiConsumer<List<DFAState>, List<Triple<DFAState, DFAState, String>>> listener) {
+	public void setSwitchTableListener(TriConsumer<List<DFAState>, List<Triple<DFAState, DFAState, String>>, ATNState> listener) {
 		this.switchTableListener = listener;
 	}
-	protected void listenSwitchTable(List<DFAState> dfaStates, List<Triple<DFAState, DFAState, String>> edges) {
+	protected void listenSwitchTable(List<DFAState> dfaStates, List<Triple<DFAState, DFAState, String>> edges, ATNState startAtn) {
 		if (switchTableListener != null) {
-			switchTableListener.accept(dfaStates, edges);
+			switchTableListener.accept(dfaStates, edges, startAtn);
 		}
 	}
 
