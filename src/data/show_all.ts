@@ -126,6 +126,9 @@ let currentTokenIndex_ = 0;
 let tryPredictTokenIndex_ = 0;
 let tokenList_: proto.ITokenMsg[] = [];
 
+let dfaStateList_: any[] = [];
+let edgeList_: any[] = [];
+
 export function getOperatorIndex(): number {
   return operatorIndex_;
 }
@@ -150,6 +153,38 @@ function setOptionList_(list: proto.ISubAugmentedTransitionNetwork[]) {
     };
     globalOptionList_.push(option);
   }
+}
+
+export function listenDfdAndEdgeStateList(dfa: any[], edge: any[]): void {
+  dfaStateList_ = dfa;
+  edgeList_ = edge;
+}
+
+function pushDFA(msg: proto.IDFAStateMsg): void {
+  let s1 = "";
+  let s2 = "";
+  if (msg.atnState) {
+    for (const atn of msg.atnState) {
+      s1 += atn.atnStateNumber;
+      s1 += "[";
+      s1 += atn.context;
+      s1 += "] ";
+      s2 += atn.atnStateNumber + " ";
+    }
+  }
+  dfaStateList_.push({
+    num: msg.dfaStateNumber,
+    dfa: s1,
+    dfaSimplify: s2
+  });
+}
+
+function pushEdge(msg: proto.IEdgeMsg): void {
+  edgeList_.push({
+    from: msg.from.dfaStateNumber,
+    upon: msg.upon,
+    to: msg.to.dfaStateNumber
+  });
 }
 
 export default function setMainResponse(resp: proto.MainResponse): boolean {
@@ -195,6 +230,10 @@ function init_(resp: proto.MainResponse): boolean {
   }
   {
     treeOption_.series[0].data = [];
+  }
+  {
+    dfaStateList_.length = 0;
+    edgeList_.length = 0;
   }
   return true;
 }
@@ -370,9 +409,7 @@ function adaptivePredict(): void {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function,@typescript-eslint/no-unused-vars
-export function debug(num: number): void {
-  reload();
-}
+export function debug(num: number): void {}
 
 export async function playbackAllOperations(times: number): Promise<void> {
   const sleepTime = sleepTime_;
@@ -492,6 +529,7 @@ function handleStartStates(operation: proto.IStartStateClosureOperation): void {
 function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
   console.log(operation);
   resetDefaultColors();
+  pushDFA(operation.newDfaState);
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
       if (operation.newDfaState.atnState) {
@@ -513,6 +551,7 @@ async function handleAddNewEdge(
   resetDefaultColors();
   adaptivePredict();
   resetTokenColor();
+  pushEdge(operation.newEdge);
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
       if (operation.newEdge.from.atnState) {
@@ -543,6 +582,7 @@ async function handleAddNewEdge(
 async function handleReuseState(
   operation: proto.IReuseStateOperation
 ): Promise<void> {
+  console.log(operation);
   resetDefaultColors();
   adaptivePredict();
   resetTokenColor();
@@ -576,6 +616,18 @@ async function handleReuseState(
 
 function handleSwitchTable(operation: proto.ISwitchTableOperation): void {
   console.log(operation);
+  dfaStateList_.length = 0;
+  if (operation.dfaStates) {
+    for (const dfaState of operation.dfaStates) {
+      pushDFA(dfaState);
+    }
+  }
+  edgeList_.length = 0;
+  if (operation.edges) {
+    for (const edge of operation.edges) {
+      pushEdge(edge);
+    }
+  }
 }
 
 function handleConsumeToken(operation: proto.IConsumeTokenOperation): void {

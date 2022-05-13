@@ -44,13 +44,47 @@
       </a-card>
     </a-col>
     <a-col :span="15">
-      <a-card>
+      <a-card style="border: 1px solid rgba(0, 0, 0)">
         <v-chart
           class="chart"
           :option="treeData"
           style="height: 270%; width: 100%"
         />
       </a-card>
+      <a-row>
+        <a-col :span="20">
+          <a-table
+            :dataSource="dfaStatesDataSource"
+            :pagination="false"
+            :bordered="true"
+            :locale="{ emptyText: `DFA状态集合` }"
+            style="border: 1px solid rgba(0, 0, 0, 0.5)"
+          >
+            <a-table-column key="num" data-index="num" title="num" :width="1">
+            </a-table-column>
+            <a-table-column key="dfa" data-index="dfa" v-if="!dfaSimplify">
+              <template #title>
+                <a @click="dfaSimplify = !dfaSimplify">dfa</a>
+              </template>
+            </a-table-column>
+            <a-table-column key="dfaSimplify" data-index="dfaSimplify" v-else>
+              <template #title>
+                <a @click="dfaSimplify = !dfaSimplify">dfa</a>
+              </template>
+            </a-table-column>
+          </a-table>
+        </a-col>
+        <a-col :span="4">
+          <a-table
+            :dataSource="edgesDataSource"
+            :columns="edgesColumns"
+            :pagination="false"
+            :bordered="true"
+            :locale="{ emptyText: `边集` }"
+            style="border: 1px solid rgba(0, 0, 0, 0.5)"
+          />
+        </a-col>
+      </a-row>
     </a-col>
   </a-row>
 </template>
@@ -64,6 +98,8 @@ import {
   Dropdown,
   Menu,
   MenuItem,
+  Table,
+  TableColumn,
   message
 } from "ant-design-vue";
 import VChart from "vue-echarts";
@@ -83,7 +119,8 @@ import {
   setNextButtonStringOnChanged,
   reload,
   getOperatorIndex,
-  playbackAllOperations
+  playbackAllOperations,
+  listenDfdAndEdgeStateList
 } from "@/data/show_all";
 import { input } from "@/router";
 
@@ -97,7 +134,9 @@ export default {
     ACol: Col,
     ADropdown: Dropdown,
     AMenu: Menu,
-    AMenuItem: MenuItem
+    AMenuItem: MenuItem,
+    ATable: Table,
+    ATableColumn: TableColumn
   },
   beforeCreate() {
     if (!loaded()) {
@@ -155,7 +194,29 @@ export default {
       currentOperationString: "",
       currentOperationButtonDisable: false,
       nextOperationString: "next",
-      operationStringList: []
+      operationStringList: [],
+      dfaStatesDataSource: [],
+      dfaSimplify: false,
+      edgesDataSource: [],
+      edgesColumns: [
+        {
+          title: "from",
+          dataIndex: "from",
+          key: "from",
+          width: 1
+        },
+        {
+          title: "upon",
+          dataIndex: "upon",
+          key: "upon"
+        },
+        {
+          title: "to",
+          dataIndex: "to",
+          key: "to",
+          width: 1
+        }
+      ]
     };
   },
   methods: {
@@ -174,11 +235,13 @@ export default {
       });
       this.currentOperationString = "";
       this.operationStringList.length = 0;
+      this.dfaStatesDataSource = [];
+      this.edgesDataSource = [];
+      listenDfdAndEdgeStateList(this.dfaStatesDataSource, this.edgesDataSource);
     },
     debug() {
-      ++this.num;
-      debug(this.num);
-      this.init();
+      debug(this.num++);
+      message.success("debug");
     },
     playbackOnce() {
       this.currentOperationButtonDisable = true;
@@ -210,4 +273,13 @@ export default {
   }
 };
 </script>
-<style scoped></style>
+<style scoped>
+/deep/ .ant-table-tbody > tr > td {
+  padding: 0;
+  text-align: center;
+}
+/deep/ .ant-table-thead > tr > th {
+  padding: 0;
+  text-align: center;
+}
+</style>
