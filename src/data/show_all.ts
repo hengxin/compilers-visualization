@@ -173,7 +173,7 @@ function pushDFA(msg: proto.IDFAStateMsg): void {
     }
   }
   dfaStateList_.push({
-    num: msg.dfaStateNumber,
+    num: "s" + msg.dfaStateNumber,
     dfa: s1,
     dfaSimplify: s2
   });
@@ -181,9 +181,9 @@ function pushDFA(msg: proto.IDFAStateMsg): void {
 
 function pushEdge(msg: proto.IEdgeMsg): void {
   edgeList_.push({
-    from: msg.from.dfaStateNumber,
+    from: "s" + msg.from.dfaStateNumber,
     upon: msg.upon,
-    to: msg.to.dfaStateNumber
+    to: "s" + msg.to.dfaStateNumber
   });
 }
 
@@ -309,7 +309,7 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
     case proto.OperationType.AddNewDFAState:
       if (operation.addNewDFAStateOperation) {
         return (
-          "添加DFA新状态 " +
+          "添加DFA新状态 s" +
           operation.addNewDFAStateOperation.newDfaState.dfaStateNumber
         );
       }
@@ -317,11 +317,11 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
     case proto.OperationType.AddNewEdge:
       if (operation.addNewEdgeOperation) {
         return (
-          "添加DFA状态边 " +
+          "添加DFA状态边 s" +
           operation.addNewEdgeOperation.newEdge.from.dfaStateNumber +
           " — " +
           operation.addNewEdgeOperation.newEdge.upon +
-          " → " +
+          " → s" +
           operation.addNewEdgeOperation.newEdge.to.dfaStateNumber
         );
       }
@@ -329,11 +329,11 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
     case proto.OperationType.ReuseState:
       if (operation.reuseStateOperation) {
         return (
-          "命中DFA缓存 " +
+          "命中DFA缓存 s" +
           operation.reuseStateOperation.reuse.from.dfaStateNumber +
           " — " +
           operation.reuseStateOperation.reuse.upon +
-          " → " +
+          " → s" +
           operation.reuseStateOperation.reuse.to.dfaStateNumber
         );
       }
