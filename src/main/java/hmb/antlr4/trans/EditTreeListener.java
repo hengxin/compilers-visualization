@@ -47,6 +47,7 @@ public class EditTreeListener implements ParseTreeListener {
                 OperationCreator.makeOperation(Response.EditTreeOperation.newBuilder()
                         .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(ctx, ctx)))
                         .setType("添加新的树节点 " + toTreeNodeUtils.parserRuleNames()[ctx.getRuleIndex()])
+                        .setCurrentNode(toTreeNodeUtils.parserRuleNames()[ctx.getRuleIndex()])
                         .build())
         );
     }
@@ -57,6 +58,7 @@ public class EditTreeListener implements ParseTreeListener {
                 OperationCreator.makeOperation(Response.EditTreeOperation.newBuilder()
                         .setParserState(Response.ParserState.newBuilder().setRoot(toTreeNodeUtils.toTree(ctx, ctx.parent)))
                         .setType("离开当前树节点 " + toTreeNodeUtils.parserRuleNames()[ctx.getRuleIndex()])
+                        .setCurrentNode(ctx.getParent() == null ? "" : toTreeNodeUtils.parserRuleNames()[ctx.getParent().getRuleIndex()])
                         .build())
         );
     }
