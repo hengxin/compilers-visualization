@@ -363,7 +363,7 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
           );
         }
         return (
-          "添加DFA新状态 s" +
+          "抵达新DFA状态 s" +
           operation.addNewDFAStateOperation.newDfaState.dfaStateNumber
         );
       }
