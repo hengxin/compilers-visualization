@@ -151,11 +151,17 @@ let tokenList_: proto.ITokenMsg[] = [];
 // 当前状态
 let currentDFAState_ = "";
 let currentNode_ = "";
-export function getCurrentState(): string {
+let decision_ = -1;
+export function getCurrentNode(): string {
+  return "当前节点: " + currentNode_;
+}
+export function getCurrentDFAState(): string {
   if (isInAdaptive_) {
-    return "当前状态: " + currentDFAState_;
+    return "决策点: " + decision_ + ", 当前状态: " + currentDFAState_;
+  } else if (decision_ >= 0) {
+    return "上次决策点: " + decision_;
   } else {
-    return "当前节点: " + currentNode_;
+    return "";
   }
 }
 
@@ -272,6 +278,7 @@ function init_(resp: proto.MainResponse): boolean {
     isInAdaptive_ = false;
     currentDFAState_ = "";
     currentNode_ = "";
+    decision_ = -1;
   }
   return true;
 }
@@ -387,7 +394,11 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
       break;
     case proto.OperationType.SwitchTable:
       if (operation.switchTableOperation) {
-        return "LL(1)无法判断，发起自适应预测算法";
+        return (
+          "LL(1)无法判断，在决策点 " +
+          operation.switchTableOperation.decision +
+          " 发起自适应预测"
+        );
       }
       break;
     case proto.OperationType.ConsumeToken:
@@ -678,6 +689,7 @@ function handleSwitchTable(operation: proto.ISwitchTableOperation): void {
   console.log(operation);
   isInAdaptive_ = true;
   currentDFAState_ = "" + operation.startAtn.atnStateNumber; // 都是从s0发起的
+  decision_ = operation.decision;
   resetTokenColor();
   resetDefaultColors();
   here: for (const op of globalOptionList_) {

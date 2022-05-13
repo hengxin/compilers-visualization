@@ -166,6 +166,7 @@ message SwitchTableOperation {
   repeated DFAStateMsg dfaStates = 1;
   repeated EdgeMsg edges = 2;
   required AtnStateMsg startAtn = 3;
+  required int32 decision = 4;
 }
 message ConsumeTokenOperation {
   required TokenMsg tokenConsumed = 1;

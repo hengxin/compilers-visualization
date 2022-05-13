@@ -13,7 +13,12 @@
     <a-input
       style="width: 15%; background: white; color: black"
       :disabled="true"
-      v-model:value="currentStateString"
+      v-model:value="currentNodeString"
+    />
+    <a-input
+      style="width: 15%; background: white; color: black"
+      :disabled="true"
+      v-model:value="currentDFAStateString"
     />
     <a-button
       @click="playbackOnce"
@@ -139,7 +144,8 @@ import {
   getOperatorIndex,
   playbackAllOperations,
   listenDfdAndEdgeStateList,
-  getCurrentState
+  getCurrentNode,
+  getCurrentDFAState
 } from "@/data/show_all";
 import { input } from "@/router";
 
@@ -212,7 +218,8 @@ export default {
         }
       ],
       treeData: getTreeOption(),
-      currentStateString: "",
+      currentNodeString: "",
+      currentDFAStateString: "",
       currentOperationString: "",
       currentOperationButtonDisable: false,
       nextOperationString: "next",
@@ -255,7 +262,8 @@ export default {
         this.nextOperationString = next;
         this.operationStringList.push(this.currentOperationString);
       });
-      this.currentStateString = "";
+      this.currentNodeString = "";
+      this.currentDFAStateString = "";
       this.currentOperationString = "";
       this.operationStringList.length = 0;
       this.dfaStatesDataSource = [];
@@ -276,12 +284,14 @@ export default {
       this.init();
       return playbackAllOperations(index).then(() => {
         this.currentOperationButtonDisable = false;
-        this.currentStateString = getCurrentState();
+        this.currentNodeString = getCurrentNode();
+        this.currentDFAStateString = getCurrentDFAState();
       });
     },
     nextOp() {
       nextOperation().then(() => {
-        this.currentStateString = getCurrentState();
+        this.currentNodeString = getCurrentNode();
+        this.currentDFAStateString = getCurrentDFAState();
       });
     },
     onMenuClick(item) {
