@@ -148,6 +148,16 @@ let currentTokenIndex_ = 0;
 let tryPredictTokenIndex_ = 0;
 let tokenList_: proto.ITokenMsg[] = [];
 
+let currentState_ = "";
+// 当前状态
+export function getCurrentState(): string {
+  if (isInAdaptive_) {
+    return currentState_;
+  } else {
+    return "";
+  }
+}
+
 let dfaStateList_: any[] = [];
 let edgeList_: any[] = [];
 
@@ -221,7 +231,6 @@ export default function setMainResponse(resp: proto.MainResponse): boolean {
   }
   succeed_ = true;
   isNewData_ = true;
-  isInAdaptive_ = false;
   return true;
 }
 
@@ -257,6 +266,10 @@ function init_(resp: proto.MainResponse): boolean {
   {
     dfaStateList_.length = 0;
     edgeList_.length = 0;
+  }
+  {
+    isInAdaptive_ = false;
+    currentState_ = "";
   }
   return true;
 }
@@ -562,6 +575,7 @@ function handleStartStates(operation: proto.IStartStateClosureOperation): void {
 
 function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
   console.log(operation);
+  currentState_ = "s" + operation.newDfaState.dfaStateNumber;
   resetDefaultColors();
   pushDFA(operation.newDfaState);
   for (const op of globalOptionList_) {
@@ -582,6 +596,7 @@ async function handleAddNewEdge(
   operation: proto.IAddNewEdgeOperation
 ): Promise<void> {
   console.log(operation);
+  currentState_ = "s" + operation.newEdge.to.dfaStateNumber;
   resetDefaultColors();
   adaptivePredict();
   resetTokenColor();
@@ -617,6 +632,7 @@ async function handleReuseState(
   operation: proto.IReuseStateOperation
 ): Promise<void> {
   console.log(operation);
+  currentState_ = "s" + operation.reuse.to.dfaStateNumber;
   resetDefaultColors();
   adaptivePredict();
   resetTokenColor();
@@ -651,6 +667,7 @@ async function handleReuseState(
 function handleSwitchTable(operation: proto.ISwitchTableOperation): void {
   console.log(operation);
   isInAdaptive_ = true;
+  currentState_ = "" + operation.startAtn.atnStateNumber; // 都是从s0发起的
   resetTokenColor();
   resetDefaultColors();
   here: for (const op of globalOptionList_) {
@@ -695,6 +712,7 @@ function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
   tryPredictTokenIndex_ = currentTokenIndex_;
   resetTokenColor();
   resetDefaultColors();
+  currentState_ = "";
 }
 
 export async function sleep(ms: number): Promise<void> {

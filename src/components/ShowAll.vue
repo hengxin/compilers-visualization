@@ -10,7 +10,9 @@
         </a-menu>
       </template>
     </a-dropdown>
-    <a-button style="width: 10%; text-align: left"><span>debug</span></a-button>
+    <a-button style="width: 15%; text-align: left">
+      <span> 当前状态: {{ currentStateString }} </span>
+    </a-button>
     <a-button
       @click="playbackOnce"
       style="
@@ -133,7 +135,8 @@ import {
   reload,
   getOperatorIndex,
   playbackAllOperations,
-  listenDfdAndEdgeStateList
+  listenDfdAndEdgeStateList,
+  getCurrentState
 } from "@/data/show_all";
 import { input } from "@/router";
 
@@ -205,6 +208,7 @@ export default {
         }
       ],
       treeData: getTreeOption(),
+      currentStateString: "",
       currentOperationString: "",
       currentOperationButtonDisable: false,
       nextOperationString: "next",
@@ -247,6 +251,7 @@ export default {
         this.nextOperationString = next;
         this.operationStringList.push(this.currentOperationString);
       });
+      this.currentStateString = "";
       this.currentOperationString = "";
       this.operationStringList.length = 0;
       this.dfaStatesDataSource = [];
@@ -267,10 +272,13 @@ export default {
       this.init();
       return playbackAllOperations(index).then(() => {
         this.currentOperationButtonDisable = false;
+        this.currentStateString = getCurrentState();
       });
     },
     nextOp() {
-      nextOperation().then();
+      nextOperation().then(() => {
+        this.currentStateString = getCurrentState();
+      });
     },
     onMenuClick(item) {
       this.playbackTo(item.key);
