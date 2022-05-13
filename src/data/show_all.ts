@@ -221,6 +221,7 @@ export default function setMainResponse(resp: proto.MainResponse): boolean {
   }
   succeed_ = true;
   isNewData_ = true;
+  isInAdaptive_ = false;
   return true;
 }
 
