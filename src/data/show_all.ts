@@ -74,8 +74,8 @@ let treeOption_ = {
       ],
       left: "2%",
       right: "2%",
-      top: "12%",
-      bottom: "12%",
+      top: "13%",
+      bottom: "5%",
       symbol: "emptyCircle",
       orient: "vertical",
       expandAndCollapse: true,
@@ -153,11 +153,27 @@ let currentDFAState_ = "";
 let currentNode_ = "";
 let decision_ = -1;
 export function getCurrentNode(): string {
-  return "当前节点: " + currentNode_;
+  if (isInAdaptive_ || currentTokenIndex_ >= tokenList_.length) {
+    return "当前节点: " + currentNode_;
+  } else {
+    return (
+      "当前节点: " +
+      currentNode_ +
+      ", 当前token: " +
+      tokenList_[currentTokenIndex_].tokenText
+    );
+  }
 }
 export function getCurrentDFAState(): string {
   if (isInAdaptive_) {
-    return "决策点: " + decision_ + ", 当前状态: " + currentDFAState_;
+    return (
+      "决策点: " +
+      decision_ +
+      ", 当前状态: " +
+      currentDFAState_ +
+      ", LT(1): " +
+      tokenList_[tryPredictTokenIndex_].tokenText
+    );
   } else if (decision_ >= 0) {
     return "上次决策点: " + decision_;
   } else {

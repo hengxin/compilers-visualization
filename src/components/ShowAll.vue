@@ -11,12 +11,12 @@
       </template>
     </a-dropdown>
     <a-input
-      style="width: 15%; background: white; color: black"
+      style="width: 18%; background: white; color: black"
       :disabled="true"
       v-model:value="currentNodeString"
     />
     <a-input
-      style="width: 15%; background: white; color: black"
+      style="width: 18%; background: white; color: black"
       :disabled="true"
       v-model:value="currentDFAStateString"
     />
@@ -35,7 +35,7 @@
     <a-button
       @click="nextOp"
       type="default"
-      style="width: 30%; text-align: left"
+      style="width: 25%; text-align: left"
     >
       {{ nextOperationButtonString }}
     </a-button>
@@ -60,7 +60,7 @@
         <v-chart
           class="chart"
           :option="op"
-          style="height: 90%; width: 100%"
+          style="height: 100%; width: 100%"
         ></v-chart>
       </a-card>
     </a-col>
@@ -69,7 +69,7 @@
         <v-chart
           class="chart"
           :option="treeData"
-          style="height: 270%; width: 100%"
+          style="height: 350%; width: 100%"
         />
       </a-card>
       <a-row>
@@ -317,5 +317,8 @@ export default {
 /deep/ .ant-table-thead > tr > th {
   padding: 0;
   text-align: center;
+}
+/deep/ .ant-card-body {
+  padding: 0;
 }
 </style>
