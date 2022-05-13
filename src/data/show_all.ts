@@ -143,6 +143,7 @@ let globalOptionList_: any[] = [];
 let operatorIndex_ = 0;
 let operationList_: proto.IOperationWrapper[] = [];
 
+let isInAdaptive_ = false;
 let currentTokenIndex_ = 0;
 let tryPredictTokenIndex_ = 0;
 let tokenList_: proto.ITokenMsg[] = [];
@@ -327,7 +328,7 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
   switch (operation.operationType) {
     case proto.OperationType.StartStateClosure:
       if (operation.startStateClosureOperation) {
-        return "开始计算闭包";
+        return "缓存未命中，开始计算闭包";
       }
       break;
     case proto.OperationType.AddNewDFAState:
@@ -408,8 +409,13 @@ function resetTokenColor(): void {
   if (currentTokenIndex_ < tokenList_.length) {
     tokenList_[currentTokenIndex_].background = currentIndexTokenColor;
   }
-  for (let i = currentTokenIndex_; i < tryPredictTokenIndex_; i++) {
-    tokenList_[i].background = tryAdaptivePredictColor;
+  if (isInAdaptive_) {
+    for (let i = currentTokenIndex_; i < tryPredictTokenIndex_; i++) {
+      tokenList_[i].background = tryAdaptivePredictColor;
+    }
+    if (tryPredictTokenIndex_ < tokenList_.length) {
+      tokenList_[tryPredictTokenIndex_].background = adaptivePredictLT1Color;
+    }
   }
 }
 
@@ -524,8 +530,9 @@ const reuseFromColor = "rgb(168, 255, 0)";
 const reuseToColor = "rgb(255, 168, 0)";
 
 const currentIndexTokenColor = "rgb(0, 128, 255)";
-const visitedTokenColor = "rgb(192, 192, 192)";
-const tryAdaptivePredictColor = "rgb(0, 255, 255)";
+const visitedTokenColor = "rgb(128, 128, 128)";
+const tryAdaptivePredictColor = "rgb(192, 192, 192)";
+const adaptivePredictLT1Color = "rgb(0, 255, 255)";
 
 function resetDefaultColors() {
   for (const op of globalOptionList_) {
@@ -642,6 +649,8 @@ async function handleReuseState(
 
 function handleSwitchTable(operation: proto.ISwitchTableOperation): void {
   console.log(operation);
+  isInAdaptive_ = true;
+  resetTokenColor();
   resetDefaultColors();
   here: for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
@@ -681,6 +690,7 @@ function handleEditTree(operation: proto.IEditTreeOperation): void {
 
 function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
   console.log(operation);
+  isInAdaptive_ = false;
   tryPredictTokenIndex_ = currentTokenIndex_;
   resetTokenColor();
   resetDefaultColors();
