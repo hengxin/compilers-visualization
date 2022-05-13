@@ -69,6 +69,7 @@ import {
 import VChart from "vue-echarts";
 
 import {
+  isNew,
   loaded,
   getInitState,
   getOptionsList,
@@ -108,7 +109,11 @@ export default {
   },
   mounted() {
     if (loaded()) {
-      this.init();
+      if (isNew()) {
+        this.init();
+      } else {
+        this.playbackOnce().then(() => this.nextOp());
+      }
       document.onkeydown = () => {
         let key = window.event.keyCode;
         if (window.event.altKey) {

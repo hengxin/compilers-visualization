@@ -163,7 +163,16 @@ export default function setMainResponse(resp: proto.MainResponse): boolean {
     return false;
   }
   succeed_ = true;
+  isNewData_ = true;
   return true;
+}
+
+let isNewData_ = false;
+
+export function isNew(): boolean {
+  const res = isNewData_;
+  isNewData_ = false;
+  return res;
 }
 
 function init_(resp: proto.MainResponse): boolean {
