@@ -103,11 +103,11 @@ public class AtnCreator {
                     };
 
                     String lineStyleColor = switch (transition) {
-                        case RuleTransition ignore -> "rgba(255,0,0,0.3)";
-                        case EpsilonTransition ignore -> "rgba(0,0,0,0.19)";
-                        case ActionTransition ignore -> "rgba(0,0,0,0.20)";
-                        case Object ignore && epsilon.equals(transitionString) -> "rgba(0,0,0,0.21)";
-                        case default -> "rgba(0,255,0,0.3)";
+                        case RuleTransition ignore -> "rgba(255,0,0,0.5)";
+                        case EpsilonTransition ignore -> "rgba(0,0,0,0.45)";
+                        case ActionTransition ignore -> "rgba(0,0,0,0.44)";
+                        case Object ignore && epsilon.equals(transitionString) -> "rgba(0,0,0,0.46)";
+                        case default -> "rgba(0,128,0,0.66)";
                     };
 
 
