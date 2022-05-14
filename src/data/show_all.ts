@@ -368,7 +368,22 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
   switch (operation.operationType) {
     case proto.OperationType.StartStateClosure:
       if (operation.startStateClosureOperation) {
-        return "缓存未命中，计算可达边";
+        return "缓存未命中，开始计算可达边";
+      }
+      break;
+    case proto.OperationType.ReachImmediate:
+      if (operation.reachImmediateOperation) {
+        return (
+          "抵达相邻状态集" +
+          (operation.reachImmediateOperation.isUnique
+            ? "，此状态集可成功决策"
+            : "")
+        );
+      }
+      break;
+    case proto.OperationType.CalEpsilonClosure:
+      if (operation.calEpsilonClosureOperation) {
+        return "此状态集结果非唯一，计算 ε 闭包";
       }
       break;
     case proto.OperationType.AddNewDFAState:
@@ -521,6 +536,18 @@ export async function nextOperation(): Promise<void> {
           return;
         }
         break;
+      case proto.OperationType.ReachImmediate:
+        if (operation.reachImmediateOperation) {
+          handleReachImmediate(operation.reachImmediateOperation);
+          return;
+        }
+        break;
+      case proto.OperationType.CalEpsilonClosure:
+        if (operation.calEpsilonClosureOperation) {
+          handleCalEpsilonClosure(operation.calEpsilonClosureOperation);
+          return;
+        }
+        break;
       case proto.OperationType.AddNewDFAState:
         if (operation.addNewDFAStateOperation) {
           handleAddNewDFAState(operation.addNewDFAStateOperation);
@@ -573,6 +600,7 @@ export async function nextOperation(): Promise<void> {
 const defaultColor = "rgb(0,0,192)";
 const newPredictColor = "rgb(192, 32, 32)";
 const startStatesColor = "rgb(96, 96, 255)";
+const reachedAtnColor = "rgb(0, 128, 0)";
 const addNewDFAStateColor = "rgb(0, 255, 255)";
 const addNewEdgeFromColor = "rgb(255, 0, 0)";
 const addNewEdgeToColor = "rgb(0, 255, 0)";
@@ -634,11 +662,46 @@ function handleStartStates(operation: proto.IStartStateClosureOperation): void {
   }
 }
 
+function handleReachImmediate(operation: proto.IReachImmediateOperation): void {
+  console.log(operation);
+  if (operation.reached) {
+    for (const op of globalOptionList_) {
+      for (const data of op.series[0].data) {
+        for (const n of operation.reached) {
+          if (parseInt(data.id) === n.atnStateNumber) {
+            data.itemStyle.color = reachedAtnColor;
+            break;
+          }
+        } // end-for
+      }
+    }
+  }
+}
+
+function handleCalEpsilonClosure(
+  operation: proto.ICalEpsilonClosureOperation
+): void {
+  console.log(operation);
+  resetDefaultColors();
+  resetLineWidths();
+  if (operation.start) {
+    for (const op of globalOptionList_) {
+      for (const data of op.series[0].data) {
+        for (const n of operation.start) {
+          if (parseInt(data.id) === n.atnStateNumber) {
+            data.itemStyle.color = reachedAtnColor;
+            break;
+          }
+        } // end-for
+      }
+    }
+  }
+}
+
 function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
   console.log(operation);
   currentDFAState_ = "s" + operation.newDfaState.dfaStateNumber;
   resetLineWidths();
-  resetDefaultColors();
   if (operation.isNew) {
     pushDFA(operation.newDfaState);
   }
