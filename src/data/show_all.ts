@@ -383,7 +383,12 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
       break;
     case proto.OperationType.CalEpsilonClosure:
       if (operation.calEpsilonClosureOperation) {
-        return "此状态集结果非唯一，计算 ε 闭包";
+        return "此状态集结果非唯一，准备计算 ε 闭包";
+      }
+      break;
+    case proto.OperationType.CalEpsilonClosureFinish:
+      if (operation.calEpsilonClosureFinishOperation) {
+        return "计算 ε 闭包完成";
       }
       break;
     case proto.OperationType.AddNewDFAState:
@@ -548,6 +553,14 @@ export async function nextOperation(): Promise<void> {
           return;
         }
         break;
+      case proto.OperationType.CalEpsilonClosureFinish:
+        if (operation.calEpsilonClosureFinishOperation) {
+          handleCalEpsilonClosureFinish(
+            operation.calEpsilonClosureFinishOperation
+          );
+          return;
+        }
+        break;
       case proto.OperationType.AddNewDFAState:
         if (operation.addNewDFAStateOperation) {
           handleAddNewDFAState(operation.addNewDFAStateOperation);
@@ -698,6 +711,30 @@ function handleCalEpsilonClosure(
   }
 }
 
+function handleCalEpsilonClosureFinish(
+  operation: proto.ICalEpsilonClosureFinishOperation
+): void {
+  console.log(operation);
+  resetLineWidths();
+  if (operation.epsilonEdge) {
+    for (const op of globalOptionList_) {
+      for (const link of op.series[0].links) {
+        for (const edge of operation.epsilonEdge) {
+          if (
+            parseInt(link.source) === edge.first.atnStateNumber &&
+            parseInt(link.target) === edge.second.atnStateNumber
+          ) {
+            console.log(link);
+            // symbolSize 为何不生效 ?
+            link.symbolSize = "10";
+            link.lineStyle.width = 3;
+            break;
+          }
+        }
+      }
+    }
+  }
+}
 function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
   console.log(operation);
   currentDFAState_ = "s" + operation.newDfaState.dfaStateNumber;

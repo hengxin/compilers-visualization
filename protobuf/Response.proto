@@ -105,6 +105,11 @@ message AtnStateMsg {
   // more...
 }
 
+message PairAtnStateMsg {
+  required AtnStateMsg first = 1;
+  required AtnStateMsg second = 2;
+}
+
 message DFAStateMsg {
   repeated AtnStateMsg atnState = 1;  // 多个ATNConfig构成的一个整体状态，称为DFAState
   optional int32 dfaStateNumber = 2 [default = -1];
@@ -130,6 +135,7 @@ enum OperationType {
   StartStateClosure = 2;
   ReachImmediate = 3;
   CalEpsilonClosure = 4;
+  CalEpsilonClosureFinish = 12;
   AddNewDFAState = 5;
   AddNewEdge = 6;
   ReuseState = 7;
@@ -144,6 +150,7 @@ message OperationWrapper {
   optional StartStateClosureOperation startStateClosureOperation = 2;
   optional ReachImmediateOperation reachImmediateOperation = 3;
   optional CalEpsilonClosureOperation calEpsilonClosureOperation = 4;
+  optional CalEpsilonClosureFinishOperation calEpsilonClosureFinishOperation = 12;
   optional AddNewDFAStateOperation addNewDFAStateOperation = 5;
   optional AddNewEdgeOperation addNewEdgeOperation = 6;
   optional ReuseStateOperation reuseStateOperation = 7;
@@ -162,6 +169,9 @@ message ReachImmediateOperation {
 }
 message CalEpsilonClosureOperation {
   repeated AtnStateMsg start = 1;
+}
+message CalEpsilonClosureFinishOperation {
+  repeated PairAtnStateMsg epsilonEdge = 1;
 }
 message AddNewDFAStateOperation {
   required DFAStateMsg newDfaState = 1;
