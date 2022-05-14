@@ -617,8 +617,8 @@ const reachedAtnColor = "rgb(0, 128, 0)";
 const addNewDFAStateColor = "rgb(0, 255, 255)";
 const addNewEdgeFromColor = "rgb(255, 0, 0)";
 const addNewEdgeToColor = "rgb(0, 255, 0)";
-const reuseFromColor = "rgb(168, 255, 0)";
-const reuseToColor = "rgb(255, 168, 0)";
+const reuseFromColor = addNewEdgeFromColor;
+const reuseToColor = addNewEdgeToColor;
 
 const currentIndexTokenColor = "rgb(0, 128, 255)";
 const visitedTokenColor = "rgb(128, 128, 128)";
@@ -766,29 +766,42 @@ async function handleAddNewEdge(
   resetTokenColor();
   resetLineWidths();
   pushEdge(operation.newEdge);
+  if (!(operation.newEdge.from.atnState && operation.newEdge.to.atnState)) {
+    return;
+  }
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
-      if (operation.newEdge.from.atnState) {
+      for (const n of operation.newEdge.from.atnState) {
+        if (parseInt(data.id) === n.atnStateNumber) {
+          data.itemStyle.color = addNewEdgeFromColor;
+          break;
+        }
+      } // end-for
+    }
+  }
+  await sleep(sleepTime_);
+  for (const op of globalOptionList_) {
+    for (const link of op.series[0].links) {
+      if (link.name === tokenList_[tryPredictTokenIndex_ - 1].tokenRule) {
         for (const n of operation.newEdge.from.atnState) {
-          if (parseInt(data.id) === n.atnStateNumber) {
-            data.itemStyle.color = addNewEdgeFromColor;
+          if (parseInt(link.source) === n.atnStateNumber) {
+            link.symbolSize = "10";
+            link.lineStyle.width = 3;
             break;
           }
-        } // end-for
+        }
       }
     }
   }
   await sleep(sleepTime_);
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
-      if (operation.newEdge.to.atnState) {
-        for (const n of operation.newEdge.to.atnState) {
-          if (parseInt(data.id) === n.atnStateNumber) {
-            data.itemStyle.color = addNewEdgeToColor;
-            break;
-          }
-        } // end-for
-      }
+      for (const n of operation.newEdge.to.atnState) {
+        if (parseInt(data.id) === n.atnStateNumber) {
+          data.itemStyle.color = addNewEdgeToColor;
+          break;
+        }
+      } // end-for
     }
   }
 }
@@ -802,30 +815,42 @@ async function handleReuseState(
   adaptivePredict();
   resetTokenColor();
   resetLineWidths();
-  console.log(operation);
+  if (!(operation.reuse.from.atnState && operation.reuse.to.atnState)) {
+    return;
+  }
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
-      if (operation.reuse.from.atnState) {
+      for (const n of operation.reuse.from.atnState) {
+        if (parseInt(data.id) === n.atnStateNumber) {
+          data.itemStyle.color = reuseFromColor;
+          break;
+        }
+      } // end-for
+    }
+  }
+  await sleep(sleepTime_);
+  for (const op of globalOptionList_) {
+    for (const link of op.series[0].links) {
+      if (link.name === tokenList_[tryPredictTokenIndex_ - 1].tokenRule) {
         for (const n of operation.reuse.from.atnState) {
-          if (parseInt(data.id) === n.atnStateNumber) {
-            data.itemStyle.color = reuseFromColor;
+          if (parseInt(link.source) === n.atnStateNumber) {
+            link.symbolSize = "10";
+            link.lineStyle.width = 3;
             break;
           }
-        } // end-for
+        }
       }
     }
   }
   await sleep(sleepTime_);
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
-      if (operation.reuse.to.atnState) {
-        for (const n of operation.reuse.to.atnState) {
-          if (parseInt(data.id) === n.atnStateNumber) {
-            data.itemStyle.color = reuseToColor;
-            break;
-          }
-        } // end-for
-      }
+      for (const n of operation.reuse.to.atnState) {
+        if (parseInt(data.id) === n.atnStateNumber) {
+          data.itemStyle.color = reuseToColor;
+          break;
+        }
+      } // end-for
     }
   }
 }
