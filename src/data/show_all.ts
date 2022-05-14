@@ -96,6 +96,9 @@ let treeOption_ = {
           align: "left"
         }
       },
+      emphasis: {
+        focus: "descendant"
+      },
       animationDurationUpdate: 500
     }
   ]
