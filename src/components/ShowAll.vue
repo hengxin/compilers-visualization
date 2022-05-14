@@ -56,7 +56,11 @@
 
   <a-row>
     <a-col :span="9">
-      <a-card v-for="(op, idx) in optionList" :key="idx" ref="vAtnList">
+      <a-card
+        v-for="(op, idx) in optionList"
+        :key="idx"
+        :bodyStyle="{ padding: 0 }"
+      >
         <v-chart
           class="chart"
           :option="op"
@@ -65,7 +69,10 @@
       </a-card>
     </a-col>
     <a-col :span="15">
-      <a-card style="border: 1px solid rgba(0, 0, 0); margin-top: 3%">
+      <a-card
+        style="border: 1px solid rgba(0, 0, 0); margin-top: 3%"
+        :bodyStyle="{ padding: 0 }"
+      >
         <v-chart
           class="chart"
           :option="treeData"
@@ -317,8 +324,5 @@ export default {
 /deep/ .ant-table-thead > tr > th {
   padding: 0;
   text-align: center;
-}
-/deep/ .ant-card-body {
-  padding: 0;
 }
 </style>
