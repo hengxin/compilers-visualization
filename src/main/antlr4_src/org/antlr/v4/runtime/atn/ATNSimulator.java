@@ -6,7 +6,6 @@
 
 package org.antlr.v4.runtime.atn;
 
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.Triple;
@@ -39,9 +38,29 @@ public abstract class ATNSimulator {
 	public void setStartStateClosureListener(Consumer<DFAState> listener) {
 		this.startStateClosureListener = listener;
 	}
-	protected void listenStateClosureListener(DFAState dfaState) {
+	protected void listenStateClosure(DFAState dfaState) {
 		if (startStateClosureListener != null) {
-			startStateClosureListener.accept(dfaState);;
+			startStateClosureListener.accept(dfaState);
+		}
+	}
+
+	private BiConsumer<Iterable<ATNState>, Boolean> reachImmediateListener = null;
+	public void setReachImmediateListener(BiConsumer<Iterable<ATNState>, Boolean> listener) {
+		this.reachImmediateListener = listener;
+	}
+	protected void listenReachImmediate(Iterable<ATNState> atnStates, boolean isUnique) {
+		if (reachImmediateListener != null) {
+			reachImmediateListener.accept(atnStates, isUnique);
+		}
+	}
+
+	private Consumer<Iterable<ATNState>> calEpsilonClosureListener = null;
+	public void setCalEpsilonClosureListener(Consumer<Iterable<ATNState>> listener) {
+		this.calEpsilonClosureListener = listener;
+	}
+	protected void listenCalEpsilonClosure(Iterable<ATNState> atnStates) {
+		if (calEpsilonClosureListener != null) {
+			calEpsilonClosureListener.accept(atnStates);
 		}
 	}
 

@@ -3,6 +3,7 @@ package hmb.utils.tools;
 
 import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNState;
+import org.antlr.v4.runtime.atn.EmptyPredictionContext;
 import org.antlr.v4.runtime.dfa.DFAState;
 
 import java.util.List;
@@ -85,11 +86,15 @@ public abstract class OperationCreator {
                 .build();
     }
 
-    public static AtnStateMsg makeATNState(ATNConfig config, Map<ATNState, ATNState> mapper) {
+    private static AtnStateMsg makeATNState(ATNConfig config, Map<ATNState, ATNState> mapper) {
         return AtnStateMsg.newBuilder()
                 .setAtnStateNumber(mapper.getOrDefault(config.state, config.state).stateNumber)
                 .setContext(config.context.toString(mapper))
                 .build();
+    }
+
+    public static AtnStateMsg makeATNState(ATNState state, Map<ATNState, ATNState> mapper) {
+        return makeATNState(new ATNConfig(state, -1, new EmptyPredictionContext()), mapper);
     }
 
     public static DFAStateMsg makeDFAState(DFAState dfaState, Map<ATNState, ATNState> mapper) {

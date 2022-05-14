@@ -157,10 +157,11 @@ message StartStateClosureOperation {
   required DFAStateMsg startingClosure = 1;
 }
 message ReachImmediateOperation {
-
+  repeated AtnStateMsg reached = 1;
+  required bool isUnique = 2;
 }
 message CalEpsilonClosureOperation {
-
+  repeated AtnStateMsg start = 1;
 }
 message AddNewDFAStateOperation {
   required DFAStateMsg newDfaState = 1;

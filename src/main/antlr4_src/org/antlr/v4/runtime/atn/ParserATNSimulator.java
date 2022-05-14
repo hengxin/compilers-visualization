@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.antlr.v4.runtime.atn.ATNState.BLOCK_END;
 
@@ -797,7 +798,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
 										   boolean fullCtx)
 	{
-		listenStateClosureListener(new DFAState(closure));
+		listenStateClosure(new DFAState(closure));
 		if ( debug )
 			System.out.println("in computeReachSet, starting closure: " + closure);
 
@@ -874,10 +875,18 @@ public class ParserATNSimulator extends ATNSimulator {
 			}
 		}
 
+		Set<ATNState> atnStateSet = intermediate.stream()
+				.map(config -> config.state)
+				.collect(Collectors.toSet());
+		listenReachImmediate(atnStateSet, reach != null);
+
 		/* If the reach set could not be trivially determined, perform a closure
 		 * operation on the intermediate set to compute its initial value.
 		 */
 		if (reach == null) {
+
+			listenCalEpsilonClosure(atnStateSet);
+
 			reach = new ATNConfigSet(fullCtx);
 			Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 			boolean treatEofAsEpsilon = t == Token.EOF;

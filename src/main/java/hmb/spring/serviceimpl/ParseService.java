@@ -62,6 +62,16 @@ public class ParseService {
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
+        atnSimulator.setReachImmediateListener((atnStates, isUnique) -> {
+            var builder = ReachImmediateOperation.newBuilder().setIsUnique(isUnique);
+            atnStates.forEach(state -> builder.addReached(OperationCreator.makeATNState(state, mapper)));
+            mainResponseBuilder.addOperation(OperationCreator.makeOperation(builder.build()));
+        });
+        atnSimulator.setCalEpsilonClosureListener(atnStates -> {
+            var builder = CalEpsilonClosureOperation.newBuilder();
+            atnStates.forEach(state -> builder.addStart(OperationCreator.makeATNState(state, mapper)));
+            mainResponseBuilder.addOperation(OperationCreator.makeOperation(builder.build()));
+        });
         atnSimulator.setAddNewDFAStateListener((dfaState, isNew) -> {
             var operation = AddNewDFAStateOperation
                     .newBuilder()
@@ -105,7 +115,7 @@ public class ParseService {
                                     .setUpon(e.c)
                                     .build()
                     ).toList())
-                    .setStartAtn(OperationCreator.makeATNState(new ATNConfig(startAtn, -1, new EmptyPredictionContext()), mapper))
+                    .setStartAtn(OperationCreator.makeATNState(startAtn, mapper))
                     .setDecision(decision)
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
