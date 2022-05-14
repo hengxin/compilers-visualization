@@ -29,7 +29,7 @@ const globalConstOption = {
         distance: 0
       },
       edgeSymbol: ["none", "arrow"],
-      edgeSymbolSize: 5,
+      edgeSymbolSize: "5",
       edgeLabel: {
         fontSize: 8,
         color: "rgb(0, 0, 0, 0.9)"
@@ -368,7 +368,7 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
   switch (operation.operationType) {
     case proto.OperationType.StartStateClosure:
       if (operation.startStateClosureOperation) {
-        return "缓存未命中，开始计算闭包";
+        return "缓存未命中，计算可达边";
       }
       break;
     case proto.OperationType.AddNewDFAState:
@@ -572,7 +572,7 @@ export async function nextOperation(): Promise<void> {
 
 const defaultColor = "rgb(0,0,192)";
 const newPredictColor = "rgb(192, 32, 32)";
-const startStatesColor = "rgb(192, 192, 255)";
+const startStatesColor = "rgb(96, 96, 255)";
 const addNewDFAStateColor = "rgb(0, 255, 255)";
 const addNewEdgeFromColor = "rgb(255, 0, 0)";
 const addNewEdgeToColor = "rgb(0, 255, 0)";
@@ -592,18 +592,43 @@ function resetDefaultColors() {
   }
 }
 
+function resetLineWidths() {
+  for (const op of globalOptionList_) {
+    for (const link of op.series[0].links) {
+      link.lineStyle.width = globalConstOption.series[0].lineStyle.width;
+      link.symbolSize = globalConstOption.series[0].edgeSymbolSize;
+    }
+  }
+}
+
 function handleStartStates(operation: proto.IStartStateClosureOperation): void {
   console.log(operation);
   resetDefaultColors();
+  resetLineWidths();
+  if (!operation.startingClosure.atnState) {
+    return;
+  }
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
-      if (operation.startingClosure.atnState) {
+      for (const n of operation.startingClosure.atnState) {
+        if (parseInt(data.id) === n.atnStateNumber) {
+          data.itemStyle.color = startStatesColor;
+          break;
+        }
+      } // end-for
+    }
+  }
+  for (const op of globalOptionList_) {
+    for (const link of op.series[0].links) {
+      if (link.name === tokenList_[tryPredictTokenIndex_].tokenRule) {
         for (const n of operation.startingClosure.atnState) {
-          if (parseInt(data.id) === n.atnStateNumber) {
-            data.itemStyle.color = startStatesColor;
+          if (parseInt(link.source) === n.atnStateNumber) {
+            // symbolSize 为何不生效 ?
+            link.symbolSize = "10";
+            link.lineStyle.width = 3;
             break;
           }
-        } // end-for
+        }
       }
     }
   }
@@ -612,6 +637,7 @@ function handleStartStates(operation: proto.IStartStateClosureOperation): void {
 function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
   console.log(operation);
   currentDFAState_ = "s" + operation.newDfaState.dfaStateNumber;
+  resetLineWidths();
   resetDefaultColors();
   if (operation.isNew) {
     pushDFA(operation.newDfaState);
@@ -638,6 +664,7 @@ async function handleAddNewEdge(
   resetDefaultColors();
   adaptivePredict();
   resetTokenColor();
+  resetLineWidths();
   pushEdge(operation.newEdge);
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
@@ -674,6 +701,7 @@ async function handleReuseState(
   resetDefaultColors();
   adaptivePredict();
   resetTokenColor();
+  resetLineWidths();
   console.log(operation);
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
@@ -709,6 +737,7 @@ function handleSwitchTable(operation: proto.ISwitchTableOperation): void {
   decision_ = operation.decision;
   resetTokenColor();
   resetDefaultColors();
+  resetLineWidths();
   here: for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
       if (parseInt(data.id) === operation.startAtn.atnStateNumber) {
@@ -752,6 +781,7 @@ function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
   tryPredictTokenIndex_ = currentTokenIndex_;
   resetTokenColor();
   resetDefaultColors();
+  resetLineWidths();
   currentDFAState_ = "";
 }
 
