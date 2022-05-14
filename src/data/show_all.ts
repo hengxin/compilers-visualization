@@ -28,8 +28,8 @@ const globalConstOption = {
         show: true,
         distance: 0
       },
-      edgeSymbol: ["circle", "arrow"],
-      edgeSymbolSize: [3, 4],
+      edgeSymbol: ["none", "arrow"],
+      edgeSymbolSize: 5,
       edgeLabel: {
         fontSize: 8,
         color: "rgb(0, 0, 0, 0.9)"
