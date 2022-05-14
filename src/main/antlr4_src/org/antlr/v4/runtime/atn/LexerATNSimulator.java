@@ -180,7 +180,7 @@ public class LexerATNSimulator extends ATNSimulator {
 		DFAState s = ds0; // s is current/from DFA state
 
 		while ( true ) { // while more work
-			listenStateClosure(s);
+			listenStartStateClosure(s);
 			if ( debug ) {
 				System.out.format(Locale.getDefault(), "execATN loop starting closure: %s\n", s.toString());
 			}

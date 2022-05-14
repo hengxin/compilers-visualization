@@ -798,7 +798,7 @@ public class ParserATNSimulator extends ATNSimulator {
 	protected ATNConfigSet computeReachSet(ATNConfigSet closure, int t,
 										   boolean fullCtx)
 	{
-		listenStateClosure(new DFAState(closure));
+		listenStartStateClosure(new DFAState(closure));
 		if ( debug )
 			System.out.println("in computeReachSet, starting closure: " + closure);
 

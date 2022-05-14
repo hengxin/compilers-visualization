@@ -38,7 +38,7 @@ public abstract class ATNSimulator {
 	public void setStartStateClosureListener(Consumer<DFAState> listener) {
 		this.startStateClosureListener = listener;
 	}
-	protected void listenStateClosure(DFAState dfaState) {
+	protected void listenStartStateClosure(DFAState dfaState) {
 		if (startStateClosureListener != null) {
 			startStateClosureListener.accept(dfaState);
 		}
