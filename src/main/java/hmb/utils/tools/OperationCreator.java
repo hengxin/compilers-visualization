@@ -22,6 +22,20 @@ public abstract class OperationCreator {
                 .build();
     }
 
+    public static OperationWrapper makeOperation(ReachImmediateOperation operation) {
+        return OperationWrapper.newBuilder()
+                .setOperationType(OperationType.ReachImmediate)
+                .setReachImmediateOperation(operation)
+                .build();
+    }
+
+    public static OperationWrapper makeOperation(CalEpsilonClosureOperation operation) {
+        return OperationWrapper.newBuilder()
+                .setOperationType(OperationType.CalEpsilonClosure)
+                .setCalEpsilonClosureOperation(operation)
+                .build();
+    }
+
     public static OperationWrapper makeOperation(AddNewDFAStateOperation operation) {
         return OperationWrapper.newBuilder()
                 .setOperationType(OperationType.AddNewDFAState)
