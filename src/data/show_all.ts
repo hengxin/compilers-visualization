@@ -25,7 +25,8 @@ const globalConstOption = {
       draggable: true,
       roam: true,
       label: {
-        show: true
+        show: true,
+        distance: 0
       },
       edgeSymbol: ["circle", "arrow"],
       edgeSymbolSize: [3, 4],
@@ -38,7 +39,7 @@ const globalConstOption = {
       links: [],
       lineStyle: {
         opacity: 0.9,
-        width: 2
+        width: 1
       },
       autoCurveness: true,
       force: {
