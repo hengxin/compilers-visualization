@@ -8,6 +8,7 @@ package org.antlr.v4.runtime.atn;
 
 import org.antlr.v4.runtime.dfa.DFAState;
 import org.antlr.v4.runtime.misc.IntervalSet;
+import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.misc.Triple;
 
 import java.util.IdentityHashMap;
@@ -61,6 +62,16 @@ public abstract class ATNSimulator {
 	protected void listenCalEpsilonClosure(Iterable<ATNState> atnStates) {
 		if (calEpsilonClosureListener != null) {
 			calEpsilonClosureListener.accept(atnStates);
+		}
+	}
+
+	private Consumer<Iterable<Pair<ATNState, ATNState>>> calEpsilonClosureFinishListener = null;
+	public void setCalEpsilonClosureFinishListener(Consumer<Iterable<Pair<ATNState, ATNState>>> listener) {
+		this.calEpsilonClosureFinishListener = listener;
+	}
+	protected void listenCalEpsilonClosureFinish(Iterable<Pair<ATNState, ATNState>> atnStates) {
+		if (calEpsilonClosureFinishListener != null) {
+			calEpsilonClosureFinishListener.accept(atnStates);
 		}
 	}
 

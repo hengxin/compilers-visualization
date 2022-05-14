@@ -37,6 +37,13 @@ public abstract class OperationCreator {
                 .build();
     }
 
+    public static OperationWrapper makeOperation(CalEpsilonClosureFinishOperation operation) {
+        return OperationWrapper.newBuilder()
+                .setOperationType(OperationType.CalEpsilonClosureFinish)
+                .setCalEpsilonClosureFinishOperation(operation)
+                .build();
+    }
+
     public static OperationWrapper makeOperation(AddNewDFAStateOperation operation) {
         return OperationWrapper.newBuilder()
                 .setOperationType(OperationType.AddNewDFAState)

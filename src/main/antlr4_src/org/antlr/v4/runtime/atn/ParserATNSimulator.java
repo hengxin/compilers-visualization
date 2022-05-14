@@ -890,9 +890,13 @@ public class ParserATNSimulator extends ATNSimulator {
 			reach = new ATNConfigSet(fullCtx);
 			Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 			boolean treatEofAsEpsilon = t == Token.EOF;
+
+			Set<Pair<ATNState, ATNState>> epsilonClosureEdgeCalculating = new HashSet<>();
 			for (ATNConfig c : intermediate) {
-				closure(c, reach, closureBusy, false, fullCtx, treatEofAsEpsilon);
+				closure(c, reach, closureBusy, false, fullCtx, treatEofAsEpsilon, epsilonClosureEdgeCalculating);
 			}
+			listenCalEpsilonClosureFinish(epsilonClosureEdgeCalculating);
+
 		}
 
 		if (t == IntStream.EOF) {
@@ -988,12 +992,15 @@ public class ParserATNSimulator extends ATNSimulator {
 		PredictionContext initialContext = PredictionContext.fromRuleContext(atn, ctx);
 		ATNConfigSet configs = new ATNConfigSet(fullCtx);
 
+		Set<Pair<ATNState, ATNState>> epsilonClosureEdgeCalculating = new HashSet<>();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
 			ATNConfig c = new ATNConfig(target, i+1, initialContext);
 			Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
-			closure(c, configs, closureBusy, true, fullCtx, false);
+			closure(c, configs, closureBusy, true, fullCtx, false, epsilonClosureEdgeCalculating);
 		}
+		listenCalEpsilonClosureFinish(epsilonClosureEdgeCalculating);
+
 
 		return configs;
 	}
@@ -1480,12 +1487,13 @@ public class ParserATNSimulator extends ATNSimulator {
 						   Set<ATNConfig> closureBusy,
 						   boolean collectPredicates,
 						   boolean fullCtx,
-						   boolean treatEofAsEpsilon)
+						   boolean treatEofAsEpsilon,
+						   Collection<Pair<ATNState, ATNState>> epsilonClosureEdgeCalculating)
 	{
 		final int initialDepth = 0;
 		closureCheckingStopState(config, configs, closureBusy, collectPredicates,
 								 fullCtx,
-								 initialDepth, treatEofAsEpsilon);
+								 initialDepth, treatEofAsEpsilon, epsilonClosureEdgeCalculating);
 		assert !fullCtx || !configs.dipsIntoOuterContext;
 	}
 
@@ -1497,7 +1505,8 @@ public class ParserATNSimulator extends ATNSimulator {
 											boolean collectPredicates,
 											boolean fullCtx,
 											int depth,
-											boolean treatEofAsEpsilon)
+											boolean treatEofAsEpsilon,
+											Collection<Pair<ATNState, ATNState>> epsilonClosureEdgeCalculating)
 	{
 		if ( closure_debug ) System.out.println("closure("+config.toString(parser,true)+")");
 
@@ -1516,7 +1525,7 @@ public class ParserATNSimulator extends ATNSimulator {
 							if ( debug ) System.out.println("FALLING off rule "+
 															getRuleName(config.state.ruleIndex));
 							closure_(config, configs, closureBusy, collectPredicates,
-									 fullCtx, depth, treatEofAsEpsilon);
+									 fullCtx, depth, treatEofAsEpsilon, epsilonClosureEdgeCalculating);
 						}
 						continue;
 					}
@@ -1533,8 +1542,12 @@ public class ParserATNSimulator extends ATNSimulator {
 					// configuration.
 					c.reachesIntoOuterContext = config.reachesIntoOuterContext;
 					assert depth > Integer.MIN_VALUE;
+
+					epsilonClosureEdgeCalculating.add(new Pair<>(config.state, c.state));
+
+					// 这段逻辑确实没看懂...
 					closureCheckingStopState(c, configs, closureBusy, collectPredicates,
-											 fullCtx, depth - 1, treatEofAsEpsilon);
+											 fullCtx, depth - 1, treatEofAsEpsilon, epsilonClosureEdgeCalculating);
 				}
 				return;
 			}
@@ -1551,7 +1564,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		}
 
 		closure_(config, configs, closureBusy, collectPredicates,
-				 fullCtx, depth, treatEofAsEpsilon);
+				 fullCtx, depth, treatEofAsEpsilon, epsilonClosureEdgeCalculating);
 	}
 
 	/** Do the actual work of walking epsilon edges */
@@ -1561,7 +1574,8 @@ public class ParserATNSimulator extends ATNSimulator {
 							boolean collectPredicates,
 							boolean fullCtx,
 							int depth,
-							boolean treatEofAsEpsilon)
+							boolean treatEofAsEpsilon,
+							Collection<Pair<ATNState, ATNState>> epsilonClosureEdgeCalculating)
 	{
 		ATNState p = config.state;
 		// optimization
@@ -1623,8 +1637,9 @@ public class ParserATNSimulator extends ATNSimulator {
 					}
 				}
 
+				epsilonClosureEdgeCalculating.add(new Pair<>(config.state, c.state));
 				closureCheckingStopState(c, configs, closureBusy, continueCollecting,
-										 fullCtx, newDepth, treatEofAsEpsilon);
+										 fullCtx, newDepth, treatEofAsEpsilon, epsilonClosureEdgeCalculating);
 			}
 		}
 	}

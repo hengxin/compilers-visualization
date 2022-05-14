@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.atn.ATNConfig;
 import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.EmptyPredictionContext;
+import org.antlr.v4.runtime.misc.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,6 +71,16 @@ public class ParseService {
         atnSimulator.setCalEpsilonClosureListener(atnStates -> {
             var builder = CalEpsilonClosureOperation.newBuilder();
             atnStates.forEach(state -> builder.addStart(OperationCreator.makeATNState(state, mapper)));
+            mainResponseBuilder.addOperation(OperationCreator.makeOperation(builder.build()));
+        });
+        atnSimulator.setCalEpsilonClosureFinishListener(pairs -> {
+            var builder = CalEpsilonClosureFinishOperation.newBuilder();
+            for (Pair<ATNState, ATNState> p : pairs) {
+                builder.addEpsilonEdge(PairAtnStateMsg.newBuilder()
+                        .setFirst(OperationCreator.makeATNState(p.a, mapper))
+                        .setSecond(OperationCreator.makeATNState(p.b, mapper))
+                        .build());
+            }
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(builder.build()));
         });
         atnSimulator.setAddNewDFAStateListener((dfaState, isNew) -> {
