@@ -128,29 +128,40 @@ message EdgeMsg {
 enum OperationType {
   Error = 0;
   StartStateClosure = 2;
-  AddNewDFAState = 3;
-  AddNewEdge = 4;
-  ReuseState = 5;
-  SwitchTable = 6;
-  ConsumeToken = 7;
-  EditTree = 8;
-  EndAdaptive = 9;
+  ReachImmediate = 3;
+  CalEpsilonClosure = 4;
+  AddNewDFAState = 5;
+  AddNewEdge = 6;
+  ReuseState = 7;
+  SwitchTable = 8;
+  ConsumeToken = 9;
+  EditTree = 10;
+  EndAdaptive = 11;
 }
 
 message OperationWrapper {
   required OperationType operationType = 1;
   optional StartStateClosureOperation startStateClosureOperation = 2;
-  optional AddNewDFAStateOperation addNewDFAStateOperation = 3;
-  optional AddNewEdgeOperation addNewEdgeOperation = 4;
-  optional ReuseStateOperation reuseStateOperation = 5;
-  optional SwitchTableOperation switchTableOperation = 6;
-  optional ConsumeTokenOperation consumeTokenOperation = 7;
-  optional EditTreeOperation editTreeOperation = 8;
-  optional EndAdaptiveOperation endAdaptiveOperation = 9;
+  optional ReachImmediateOperation reachImmediateOperation = 3;
+  optional CalEpsilonClosureOperation calEpsilonClosureOperation = 4;
+  optional AddNewDFAStateOperation addNewDFAStateOperation = 5;
+  optional AddNewEdgeOperation addNewEdgeOperation = 6;
+  optional ReuseStateOperation reuseStateOperation = 7;
+  optional SwitchTableOperation switchTableOperation = 8;
+  optional ConsumeTokenOperation consumeTokenOperation = 9;
+  optional EditTreeOperation editTreeOperation = 10;
+  optional EndAdaptiveOperation endAdaptiveOperation = 11;
 }
 
 message StartStateClosureOperation {
   required DFAStateMsg startingClosure = 1;
+}
+message ReachImmediateOperation {
+  repeated AtnStateMsg reached = 1;
+  required bool isUnique = 2;
+}
+message CalEpsilonClosureOperation {
+  repeated AtnStateMsg start = 1;
 }
 message AddNewDFAStateOperation {
   required DFAStateMsg newDfaState = 1;
