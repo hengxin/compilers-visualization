@@ -995,7 +995,8 @@ public class ParserATNSimulator extends ATNSimulator {
 		Set<Pair<ATNState, ATNState>> epsilonClosureEdgeCalculating = new HashSet<>();
 		for (int i=0; i<p.getNumberOfTransitions(); i++) {
 			ATNState target = p.transition(i).target;
-			ATNConfig c = new ATNConfig(target, i+1, initialContext);
+            epsilonClosureEdgeCalculating.add(new Pair<>(p, target));
+            ATNConfig c = new ATNConfig(target, i+1, initialContext);
 			Set<ATNConfig> closureBusy = new HashSet<ATNConfig>();
 			closure(c, configs, closureBusy, true, fullCtx, false, epsilonClosureEdgeCalculating);
 		}
