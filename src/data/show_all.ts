@@ -384,8 +384,8 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
         );
       }
       break;
-    case proto.OperationType.CalEpsilonClosure:
-      if (operation.calEpsilonClosureOperation) {
+    case proto.OperationType.StartCalEpsilonClosure:
+      if (operation.startCalEpsilonClosureOperation) {
         return "此状态集结果非唯一，准备计算 ε 闭包";
       }
       break;
@@ -394,17 +394,17 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
         return "计算 ε 闭包完成";
       }
       break;
-    case proto.OperationType.AddNewDFAState:
-      if (operation.addNewDFAStateOperation) {
-        if (!operation.addNewDFAStateOperation.isNew) {
+    case proto.OperationType.ReachDFAState:
+      if (operation.reachDFAStateOperation) {
+        if (!operation.reachDFAStateOperation.isNew) {
           return (
             "抵达已有DFA状态 s" +
-            operation.addNewDFAStateOperation.newDfaState.dfaStateNumber
+            operation.reachDFAStateOperation.dfaState.dfaStateNumber
           );
         }
         return (
           "抵达新DFA状态 s" +
-          operation.addNewDFAStateOperation.newDfaState.dfaStateNumber
+          operation.reachDFAStateOperation.dfaState.dfaStateNumber
         );
       }
       break;
@@ -420,23 +420,23 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
         );
       }
       break;
-    case proto.OperationType.ReuseState:
-      if (operation.reuseStateOperation) {
+    case proto.OperationType.ReuseEdge:
+      if (operation.reuseEdgeOperation) {
         return (
           "命中DFA缓存 s" +
-          operation.reuseStateOperation.reuse.from.dfaStateNumber +
+          operation.reuseEdgeOperation.reuse.from.dfaStateNumber +
           " — " +
-          operation.reuseStateOperation.reuse.upon +
+          operation.reuseEdgeOperation.reuse.upon +
           " → s" +
-          operation.reuseStateOperation.reuse.to.dfaStateNumber
+          operation.reuseEdgeOperation.reuse.to.dfaStateNumber
         );
       }
       break;
-    case proto.OperationType.SwitchTable:
-      if (operation.switchTableOperation) {
+    case proto.OperationType.StartAdaptive:
+      if (operation.startAdaptiveOperation) {
         return (
           "LL(1)无法判断，在决策点 " +
-          operation.switchTableOperation.decision +
+          operation.startAdaptiveOperation.decision +
           " 发起自适应预测"
         );
       }
@@ -550,9 +550,11 @@ export async function nextOperation(): Promise<void> {
           return;
         }
         break;
-      case proto.OperationType.CalEpsilonClosure:
-        if (operation.calEpsilonClosureOperation) {
-          handleCalEpsilonClosure(operation.calEpsilonClosureOperation);
+      case proto.OperationType.StartCalEpsilonClosure:
+        if (operation.startCalEpsilonClosureOperation) {
+          handleStartCalEpsilonClosure(
+            operation.startCalEpsilonClosureOperation
+          );
           return;
         }
         break;
@@ -564,9 +566,9 @@ export async function nextOperation(): Promise<void> {
           return;
         }
         break;
-      case proto.OperationType.AddNewDFAState:
-        if (operation.addNewDFAStateOperation) {
-          handleAddNewDFAState(operation.addNewDFAStateOperation);
+      case proto.OperationType.ReachDFAState:
+        if (operation.reachDFAStateOperation) {
+          handleReachDFAState(operation.reachDFAStateOperation);
           return;
         }
         break;
@@ -576,15 +578,15 @@ export async function nextOperation(): Promise<void> {
           return;
         }
         break;
-      case proto.OperationType.ReuseState:
-        if (operation.reuseStateOperation) {
-          await handleReuseState(operation.reuseStateOperation);
+      case proto.OperationType.ReuseEdge:
+        if (operation.reuseEdgeOperation) {
+          await handleReuseEdge(operation.reuseEdgeOperation);
           return;
         }
         break;
-      case proto.OperationType.SwitchTable:
-        if (operation.switchTableOperation) {
-          handleSwitchTable(operation.switchTableOperation);
+      case proto.OperationType.StartAdaptive:
+        if (operation.startAdaptiveOperation) {
+          handleStartApaptive(operation.startAdaptiveOperation);
           return;
         }
         break;
@@ -694,8 +696,8 @@ function handleReachImmediate(operation: proto.IReachImmediateOperation): void {
   }
 }
 
-function handleCalEpsilonClosure(
-  operation: proto.ICalEpsilonClosureOperation
+function handleStartCalEpsilonClosure(
+  operation: proto.IStartCalEpsilonClosureOperation
 ): void {
   console.log(operation);
   resetDefaultColors();
@@ -738,17 +740,17 @@ function handleCalEpsilonClosureFinish(
     }
   }
 }
-function handleAddNewDFAState(operation: proto.IAddNewDFAStateOperation): void {
+function handleReachDFAState(operation: proto.IReachDFAStateOperation): void {
   console.log(operation);
-  currentDFAState_ = "s" + operation.newDfaState.dfaStateNumber;
+  currentDFAState_ = "s" + operation.dfaState.dfaStateNumber;
   resetLineWidths();
   if (operation.isNew) {
-    pushDFA(operation.newDfaState);
+    pushDFA(operation.dfaState);
   }
   for (const op of globalOptionList_) {
     for (const data of op.series[0].data) {
-      if (operation.newDfaState.atnState) {
-        for (const n of operation.newDfaState.atnState) {
+      if (operation.dfaState.atnState) {
+        for (const n of operation.dfaState.atnState) {
           if (parseInt(data.id) === n.atnStateNumber) {
             data.itemStyle.color = addNewDFAStateColor;
             break;
@@ -809,8 +811,8 @@ async function handleAddNewEdge(
   }
 }
 
-async function handleReuseState(
-  operation: proto.IReuseStateOperation
+async function handleReuseEdge(
+  operation: proto.IReuseEdgeOperation
 ): Promise<void> {
   console.log(operation);
   currentDFAState_ = "s" + operation.reuse.to.dfaStateNumber;
@@ -858,7 +860,7 @@ async function handleReuseState(
   }
 }
 
-function handleSwitchTable(operation: proto.ISwitchTableOperation): void {
+function handleStartApaptive(operation: proto.IStartAdaptiveOperation): void {
   console.log(operation);
   isInAdaptive_ = true;
   currentDFAState_ = "" + operation.startAtn.atnStateNumber; // 都是从s0发起的
