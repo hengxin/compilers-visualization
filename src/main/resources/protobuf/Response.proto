@@ -134,30 +134,30 @@ enum OperationType {
   Error = 0;
   StartStateClosure = 2;
   ReachImmediate = 3;
-  CalEpsilonClosure = 4;
-  CalEpsilonClosureFinish = 12;
-  AddNewDFAState = 5;
-  AddNewEdge = 6;
-  ReuseState = 7;
-  SwitchTable = 8;
-  ConsumeToken = 9;
-  EditTree = 10;
-  EndAdaptive = 11;
+  StartCalEpsilonClosure = 4;
+  CalEpsilonClosureFinish = 5;
+  ReachDFAState = 6;
+  AddNewEdge = 7;
+  ReuseEdge = 8;
+  StartAdaptive = 9;
+  ConsumeToken = 10;
+  EditTree = 11;
+  EndAdaptive = 12;
 }
 
 message OperationWrapper {
   required OperationType operationType = 1;
   optional StartStateClosureOperation startStateClosureOperation = 2;
   optional ReachImmediateOperation reachImmediateOperation = 3;
-  optional CalEpsilonClosureOperation calEpsilonClosureOperation = 4;
-  optional CalEpsilonClosureFinishOperation calEpsilonClosureFinishOperation = 12;
-  optional AddNewDFAStateOperation addNewDFAStateOperation = 5;
-  optional AddNewEdgeOperation addNewEdgeOperation = 6;
-  optional ReuseStateOperation reuseStateOperation = 7;
-  optional SwitchTableOperation switchTableOperation = 8;
-  optional ConsumeTokenOperation consumeTokenOperation = 9;
-  optional EditTreeOperation editTreeOperation = 10;
-  optional EndAdaptiveOperation endAdaptiveOperation = 11;
+  optional StartCalEpsilonClosureOperation startCalEpsilonClosureOperation = 4;
+  optional CalEpsilonClosureFinishOperation calEpsilonClosureFinishOperation = 5;
+  optional ReachDFAStateOperation reachDFAStateOperation = 6;
+  optional AddNewEdgeOperation addNewEdgeOperation = 7;
+  optional ReuseEdgeOperation reuseEdgeOperation = 8;
+  optional StartAdaptiveOperation startAdaptiveOperation = 9;
+  optional ConsumeTokenOperation consumeTokenOperation = 10;
+  optional EditTreeOperation editTreeOperation = 11;
+  optional EndAdaptiveOperation endAdaptiveOperation = 12;
 }
 
 message StartStateClosureOperation {
@@ -167,23 +167,23 @@ message ReachImmediateOperation {
   repeated AtnStateMsg reached = 1;
   required bool isUnique = 2;
 }
-message CalEpsilonClosureOperation {
+message StartCalEpsilonClosureOperation {
   repeated AtnStateMsg start = 1;
 }
 message CalEpsilonClosureFinishOperation {
   repeated PairAtnStateMsg epsilonEdge = 1;
 }
-message AddNewDFAStateOperation {
-  required DFAStateMsg newDfaState = 1;
+message ReachDFAStateOperation {
+  required DFAStateMsg dfaState = 1;
   required bool isNew = 2;  // 可能抵达了某一条边，但之前已经进入过。这时候map.put是一个空操作
 }
 message AddNewEdgeOperation {
   required EdgeMsg newEdge = 1;
 }
-message ReuseStateOperation {
+message ReuseEdgeOperation {
   required EdgeMsg reuse = 1;
 }
-message SwitchTableOperation {
+message StartAdaptiveOperation {  // 开始自适应预测算法，需要切换表格
   repeated DFAStateMsg dfaStates = 1;
   repeated EdgeMsg edges = 2;
   required AtnStateMsg startAtn = 3;
@@ -198,7 +198,7 @@ message EditTreeOperation {
   required string type = 2;  // 供前端打印，主要是push和pop
   required string currentNode = 3;  // 当前位于哪个位置。因为栈顶都是非终结符，因此ConsumeToken时不需使用此条件
 }
-message EndAdaptiveOperation {
+message EndAdaptiveOperation {  // 结束自适应预测算法
   required int32 alt = 1;
 }
 //=============================== ⬆ operation ⬆ ===============================

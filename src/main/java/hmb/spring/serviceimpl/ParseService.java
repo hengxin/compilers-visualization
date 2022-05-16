@@ -69,7 +69,7 @@ public class ParseService {
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(builder.build()));
         });
         atnSimulator.setCalEpsilonClosureListener(atnStates -> {
-            var builder = CalEpsilonClosureOperation.newBuilder();
+            var builder = StartCalEpsilonClosureOperation.newBuilder();
             atnStates.forEach(state -> builder.addStart(OperationCreator.makeATNState(state, mapper)));
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(builder.build()));
         });
@@ -84,9 +84,9 @@ public class ParseService {
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(builder.build()));
         });
         atnSimulator.setAddNewDFAStateListener((dfaState, isNew) -> {
-            var operation = AddNewDFAStateOperation
+            var operation = ReachDFAStateOperation
                     .newBuilder()
-                    .setNewDfaState(OperationCreator.makeDFAState(dfaState, mapper))
+                    .setDfaState(OperationCreator.makeDFAState(dfaState, mapper))
                     .setIsNew(isNew)
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
@@ -103,7 +103,7 @@ public class ParseService {
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
         atnSimulator.setReuseStateListener((from, to, upon) -> {
-            var operation = ReuseStateOperation
+            var operation = ReuseEdgeOperation
                     .newBuilder()
                     .setReuse(EdgeMsg.newBuilder()
                             .setFrom(OperationCreator.makeDFAState(from, mapper))
@@ -114,7 +114,7 @@ public class ParseService {
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
         atnSimulator.setSwitchTableListener((dfaStateList, edgeList, startAtn, decision) -> {
-            var operation = SwitchTableOperation
+            var operation = StartAdaptiveOperation
                     .newBuilder()
                     .addAllDfaStates(dfaStateList.stream().map(
                             s -> OperationCreator.makeDFAState(s, mapper)

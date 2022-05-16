@@ -30,10 +30,10 @@ public abstract class OperationCreator {
                 .build();
     }
 
-    public static OperationWrapper makeOperation(CalEpsilonClosureOperation operation) {
+    public static OperationWrapper makeOperation(StartCalEpsilonClosureOperation operation) {
         return OperationWrapper.newBuilder()
-                .setOperationType(OperationType.CalEpsilonClosure)
-                .setCalEpsilonClosureOperation(operation)
+                .setOperationType(OperationType.StartCalEpsilonClosure)
+                .setStartCalEpsilonClosureOperation(operation)
                 .build();
     }
 
@@ -44,10 +44,10 @@ public abstract class OperationCreator {
                 .build();
     }
 
-    public static OperationWrapper makeOperation(AddNewDFAStateOperation operation) {
+    public static OperationWrapper makeOperation(ReachDFAStateOperation operation) {
         return OperationWrapper.newBuilder()
-                .setOperationType(OperationType.AddNewDFAState)
-                .setAddNewDFAStateOperation(operation)
+                .setOperationType(OperationType.ReachDFAState)
+                .setReachDFAStateOperation(operation)
                 .build();
     }
 
@@ -58,17 +58,17 @@ public abstract class OperationCreator {
                 .build();
     }
 
-    public static OperationWrapper makeOperation(ReuseStateOperation operation) {
+    public static OperationWrapper makeOperation(ReuseEdgeOperation operation) {
         return OperationWrapper.newBuilder()
-                .setOperationType(OperationType.ReuseState)
-                .setReuseStateOperation(operation)
+                .setOperationType(OperationType.ReuseEdge)
+                .setReuseEdgeOperation(operation)
                 .build();
     }
 
-    public static OperationWrapper makeOperation(SwitchTableOperation operation) {
+    public static OperationWrapper makeOperation(StartAdaptiveOperation operation) {
         return OperationWrapper.newBuilder()
-                .setOperationType(OperationType.SwitchTable)
-                .setSwitchTableOperation(operation)
+                .setOperationType(OperationType.StartAdaptive)
+                .setStartAdaptiveOperation(operation)
                 .build();
     }
 
