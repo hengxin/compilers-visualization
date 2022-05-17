@@ -105,7 +105,8 @@ const myStore = createStore({
         "\n" +
         "expr3:\n" +
         "    LP* ID RP* ;\n",
-      globalCodeString: "((2));\n" + "(((3.3)));"
+      globalCodeString: "((2));\n" + "(((3.3)));",
+      globalStartRule: "program"
     };
   },
   mutations: {
@@ -123,6 +124,9 @@ const myStore = createStore({
     },
     setCode(state, code) {
       state.globalCodeString = code;
+    },
+    setStartRule(state, rule) {
+      state.globalStartRule = rule;
     }
   }
 });

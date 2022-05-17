@@ -6,6 +6,11 @@
         placeholder="grammar name"
         style="width: 30%"
       />
+      <a-input
+        v-model:value="startRule"
+        placeholder="start rule"
+        style="width: 30%"
+      />
       <a-button type="primary" @click="ok">开始解析</a-button>
       <a-button
         type="default"
@@ -15,6 +20,7 @@
             this.lexer = '';
             this.parser = '';
             this.code = '';
+            this.startRule = '';
           }
         "
         danger
@@ -76,7 +82,8 @@ export default {
       "globalGrammarName",
       "globalLexerString",
       "globalParserString",
-      "globalCodeString"
+      "globalCodeString",
+      "globalStartRule"
     ]),
     grammarName: {
       get() {
@@ -109,6 +116,14 @@ export default {
       set(val) {
         this.setCode(val);
       }
+    },
+    startRule: {
+      get() {
+        return this.globalStartRule;
+      },
+      set(val) {
+        this.setStartRule(val);
+      }
     }
   },
   methods: {
@@ -117,7 +132,8 @@ export default {
       "setGrammarString",
       "setLexer",
       "setParser",
-      "setCode"
+      "setCode",
+      "setStartRule"
     ]),
     ok() {
       this.setUserId(0);
@@ -126,7 +142,8 @@ export default {
       const lexer = this.lexer;
       const parser = this.parser;
       const code = this.code;
-      parse(userId, grammarName, lexer, parser, code)
+      const startRule = this.startRule;
+      parse(userId, grammarName, lexer, parser, code, startRule)
         .then(s => {
           if (s) {
             showAll();

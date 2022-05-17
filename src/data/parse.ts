@@ -26,7 +26,8 @@ export async function parse(
   name: string,
   lexer: string,
   parser: string,
-  code: string
+  code: string,
+  startRule: string
 ): Promise<boolean | void> {
   const r = new proto.MainRequest();
   r.userId = userId;
@@ -34,6 +35,7 @@ export async function parse(
   r.lexer = lexer;
   r.parser = parser;
   r.code = code;
+  r.startRule = startRule;
   return _parse(r).then(resp => {
     if (!resp.success) {
       message.error(resp.errorMessage);
