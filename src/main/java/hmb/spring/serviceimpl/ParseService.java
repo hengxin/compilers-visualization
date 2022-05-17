@@ -15,6 +15,7 @@ import org.antlr.v4.runtime.atn.ATNSimulator;
 import org.antlr.v4.runtime.atn.ATNState;
 import org.antlr.v4.runtime.atn.EmptyPredictionContext;
 import org.antlr.v4.runtime.misc.Pair;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -254,7 +255,7 @@ public class ParseService {
             );
             // lexer与parser加载完毕
 
-            parser.get().setTrace(true);
+//            parser.get().setTrace(true);
             var lexerAtnCreator = new AtnCreator(lexer.get());
             var parserAtnCreator = new AtnCreator(parser.get(), lexer.get().getVocabulary());
             var lexerATN = lexerAtnCreator.getATNs();
@@ -273,7 +274,8 @@ public class ParseService {
 
 
             parser.get().setErrorHandler(new BailErrorStrategy());
-            ParserRuleContext program = parser.invokeMemberMethod("program", new Class[0]);
+            final String startRule = Strings.isBlank(mainRequest.getStartRule()) ? "program" : mainRequest.getStartRule().trim();
+            ParserRuleContext program = parser.invokeMemberMethod(startRule, new Class[0]);
 
             return mainResponseBuilder.setSuccess(true).setInitialState(InitialState.newBuilder()
                     .setLexerATN(lexerATN)

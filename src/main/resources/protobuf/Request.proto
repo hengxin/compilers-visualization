@@ -7,4 +7,5 @@ message MainRequest {
   string lexer = 3;
   string parser = 4;
   string code = 5;
+  string startRule = 6;
 }
