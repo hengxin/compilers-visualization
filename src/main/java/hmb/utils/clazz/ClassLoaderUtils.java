@@ -26,20 +26,16 @@ public final class ClassLoaderUtils {
         }
     }
 
-    public static Method findMethod(Class<?> aClass, String methodName, Class<?>[] parameterTypes) {
-        try {
-            return aClass.getDeclaredMethod(methodName, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
+    public static Method findMethod(Class<?> aClass, String methodName, Class<?>[] parameterTypes) throws NoSuchMethodException {
+        return aClass.getDeclaredMethod(methodName, parameterTypes);
     }
 
     public static <T> T invokeMemberMethod(Class<?> aClass, Object thisObject, String methodName,
-                                           Class<?>[] parameterTypes, Object... args) {
+                                           Class<?>[] parameterTypes, Object... args) throws NoSuchMethodException  {
         return invokeMethod(findMethod(aClass, methodName, parameterTypes), thisObject, args);
     }
 
-    public static <T> T invokeStaticMethod(Class<?> aClass, String methodName, Class<?>[] parameterTypes, Object... args) {
+    public static <T> T invokeStaticMethod(Class<?> aClass, String methodName, Class<?>[] parameterTypes, Object... args) throws NoSuchMethodException {
         return invokeMethod(findMethod(aClass, methodName, parameterTypes), null, args);
     }
 

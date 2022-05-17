@@ -42,11 +42,11 @@ public class ObjectManager<T> implements Closeable {
         return thisObject;
     }
 
-    public Method findMethod(String methodName, Class<?>[] parameterTypes) {
+    public Method findMethod(String methodName, Class<?>[] parameterTypes) throws NoSuchMethodException  {
         return ClassLoaderUtils.findMethod(thisClass, methodName, parameterTypes);
     }
 
-    public <U> U invokeStaticMethod(String methodName, Class<?>[] parameterTypes, Object... args) {
+    public <U> U invokeStaticMethod(String methodName, Class<?>[] parameterTypes, Object... args) throws NoSuchMethodException  {
         return ClassLoaderUtils.invokeStaticMethod(findMethod(methodName, parameterTypes), args);
     }
 
@@ -54,11 +54,11 @@ public class ObjectManager<T> implements Closeable {
         return ClassLoaderUtils.invokeMemberMethod(thisObject, method, args);
     }
 
-    public <U> U invokeMemberMethod(String methodName, Class<?>[] parameterTypes, Object... args) {
+    public <U> U invokeMemberMethod(String methodName, Class<?>[] parameterTypes, Object... args) throws NoSuchMethodException  {
         return this.invokeMemberMethod(findMethod(methodName, parameterTypes), args);
     }
 
-    public <U> U invokeMemberMethod(String methodName) {
+    public <U> U invokeMemberMethod(String methodName) throws NoSuchMethodException  {
         return this.invokeMemberMethod(methodName, new Class[]{});
     }
 

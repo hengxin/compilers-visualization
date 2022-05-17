@@ -26,7 +26,7 @@ public class EditTreeListener implements ParseTreeListener {
 
     @Override
     public void visitErrorNode(ErrorNode node) {
-        throw new RuntimeException("ErrorNode = " + node.toStringTree());
+        System.err.println("ErrorNode = " + node.toStringTree());
     }
 
     @Override

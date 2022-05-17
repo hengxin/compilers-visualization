@@ -273,9 +273,29 @@ public class ParseService {
             parser.get().addParseListener(new EditTreeListener(mainResponseBuilder, toTreeNodeUtils));
 
 
-            parser.get().setErrorHandler(new BailErrorStrategy());
+            StringBuilder errorSB = new StringBuilder();
+            parser.get().removeErrorListeners();
+            parser.get().addErrorListener(new BaseErrorListener() {
+                @Override
+                public void syntaxError(Recognizer<?, ?> recognizer,
+                                        Object offendingSymbol,
+                                        int line,
+                                        int charPositionInLine,
+                                        String msg,
+                                        RecognitionException e)
+                {
+                    errorSB.append("line ").append(line).append(':').append(charPositionInLine).append(' ').append(msg).append(".\n");
+                }
+            });
             final String startRule = Strings.isBlank(mainRequest.getStartRule()) ? "program" : mainRequest.getStartRule().trim();
-            ParserRuleContext program = parser.invokeMemberMethod(startRule, new Class[0]);
+            try {
+                ParserRuleContext program = parser.invokeMemberMethod(startRule, new Class[0]);
+            } catch (NoSuchMethodException e) {
+                throw new MyServiceException("NoSuchRule: " + startRule);
+            }
+            if (!errorSB.isEmpty()) {
+                throw new MyServiceException("[SyntaxError]\n\n" + errorSB);
+            }
 
             return mainResponseBuilder.setSuccess(true).setInitialState(InitialState.newBuilder()
                     .setLexerATN(lexerATN)
