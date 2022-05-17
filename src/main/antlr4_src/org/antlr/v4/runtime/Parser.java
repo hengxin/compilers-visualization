@@ -590,13 +590,11 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 	public Token consume() {
 		Token o = getCurrentToken();
 		if (o.getType() != EOF) {
-			System.out.print("consume: ");
 			getInputStream().consume();
 		}
 		boolean hasListener = _parseListeners != null && !_parseListeners.isEmpty();
 		if (_buildParseTrees || hasListener) {
 			if ( _errHandler.inErrorRecoveryMode(this) ) {
-				System.out.println("mode=SKIP");
 				ErrorNode node = _ctx.addErrorNode(createErrorNode(_ctx,o));
 				if (_parseListeners != null) {
 					for (ParseTreeListener listener : _parseListeners) {
@@ -605,7 +603,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 				}
 			}
 			else {
-				System.out.println("mode = consume ");
 				TerminalNode node = _ctx.addChild(createTerminalNode(_ctx,o));
 				listenConsumeToken(o, node);
 				if (_parseListeners != null) {
@@ -616,7 +613,6 @@ public abstract class Parser extends Recognizer<Token, ParserATNSimulator> {
 				}
 			}
 		}
-		else System.out.println("MODE = ERROR");
 		return o;
 	}
 

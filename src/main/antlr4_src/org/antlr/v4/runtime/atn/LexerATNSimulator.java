@@ -16,9 +16,9 @@ import java.util.Locale;
 
 /** "dup" of ParserInterpreter */
 public class LexerATNSimulator extends ATNSimulator {
-	public static boolean debug = true;
+	public static boolean debug = false;
 	public static boolean closure_debug = false;
-	public static boolean dfa_debug = true;
+	public static boolean dfa_debug = false;
 	public static boolean testing_debug = false;
 
 	public static final int MIN_DFA_EDGE = 0;
