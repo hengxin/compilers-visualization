@@ -504,7 +504,9 @@ export function listenTokenList(list: proto.ITokenMsg[]): void {
 }
 
 function nextToken(): void {
-  currentTokenIndex_++;
+  if (currentTokenIndex_ < tokenList_.length - 1) {
+    currentTokenIndex_++;
+  }
 }
 
 function adaptivePredict(): void {
