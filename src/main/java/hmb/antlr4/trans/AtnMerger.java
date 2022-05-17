@@ -94,25 +94,25 @@ public class AtnMerger {
             if (!result.containsKey(state)) {
                 LinkedList<ATNState> linkedList = new LinkedList<>();
                 ATNState curState = state;
-                while (true) {
+                while (onlyOneEpsilonNext.contains(curState)) {
                     final Transition transition = curState.transition(0);
                     final ATNState next = transition.target;
-                    ATNState end = curState;
-                    if (true || onlyOneEpsilonBefore.contains(next)) {
-                        linkedList.add(curState);
-                        end = next;
-                    }
-                    if (onlyOneEpsilonBefore.contains(next) && onlyOneEpsilonNext.contains(next)) {
-                        curState = next;
-                    } else {
+                    linkedList.add(curState);
+                    if (!onlyOneEpsilonNext.contains(next)) {
                         for (ATNState s : linkedList) {
-                            result.put(s, end);
+                            assert !result.containsKey(next);
+                            result.put(s, next);
                         }
-                        break;
                     }
+                    curState = next;
                 }
 
             }
+        }
+
+        if (Arrays.stream(result.get(ruleStartState).getTransitions()).noneMatch(t -> t instanceof EpsilonTransition)) {
+            // 如果简化后使得一个ruleStartState没有epsilon出边，则十分不利于可视化闭包计算过程。因为缺乏相关的边来提供加粗展示。
+            result.remove(ruleStartState);
         }
 
         return result;
