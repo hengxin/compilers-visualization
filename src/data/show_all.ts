@@ -463,6 +463,14 @@ function getNextOperationString(operation: proto.IOperationWrapper): string {
         );
       }
       break;
+    case proto.OperationType.StayAtDFAState:
+      if (operation.stayAtDFAStateOperation) {
+        return (
+          "位于DFA状态 s" +
+          operation.stayAtDFAStateOperation.dfaState.dfaStateNumber
+        );
+      }
+      break;
     default:
       return "Unknown Type " + operation.operationType;
   }
@@ -610,6 +618,12 @@ export async function nextOperation(): Promise<void> {
           return;
         }
         break;
+      case proto.OperationType.StayAtDFAState:
+        if (operation.stayAtDFAStateOperation) {
+          handleStayAtDFAState(operation.stayAtDFAStateOperation);
+          return;
+        }
+        break;
       default:
         message.error("unknown type " + operation.operationType).then();
     }
@@ -619,9 +633,9 @@ export async function nextOperation(): Promise<void> {
 
 const defaultColor = "rgb(0,0,192)";
 const newPredictColor = "rgb(192, 32, 32)";
-const startStatesColor = "rgb(96, 96, 255)";
-const reachedAtnColor = "rgb(0, 128, 0)";
-const addNewDFAStateColor = "rgb(0, 255, 255)";
+const startStatesColor = "rgb(96, 255, 255)";
+const reachedAtnColor = "rgb(0, 240, 0)";
+const addNewDFAStateColor = "rgb(0, 255, 0)";
 const addNewEdgeFromColor = "rgb(255, 0, 0)";
 const addNewEdgeToColor = "rgb(0, 255, 0)";
 const reuseFromColor = addNewEdgeFromColor;
@@ -915,6 +929,24 @@ function handleEndAdaptive(operation: proto.IEndAdaptiveOperation): void {
   resetDefaultColors();
   resetLineWidths();
   currentDFAState_ = "";
+}
+
+function handleStayAtDFAState(operation: proto.IStayAtDFAStateOperation): void {
+  console.log(operation);
+  resetDefaultColors();
+  resetLineWidths();
+  for (const op of globalOptionList_) {
+    for (const data of op.series[0].data) {
+      if (operation.dfaState.atnState) {
+        for (const n of operation.dfaState.atnState) {
+          if (parseInt(data.id) === n.atnStateNumber) {
+            data.itemStyle.color = startStatesColor;
+            break;
+          }
+        } // end-for
+      }
+    }
+  }
 }
 
 export async function sleep(ms: number): Promise<void> {
