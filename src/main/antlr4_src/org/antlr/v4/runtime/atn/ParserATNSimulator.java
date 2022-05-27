@@ -578,6 +578,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		DFAState target = edges[t + 1];
 		if (target != null) {
 			listenReuseState(previousD, target, getTokenName(t));
+			listenStayAtDFAState(target);
 		}
 		if (debug && target != null) {
 			System.out.println("Reuse state "+previousD.stateNumber+
@@ -2140,6 +2141,7 @@ public class ParserATNSimulator extends ATNSimulator {
 		if ( debug ) {
 			System.out.println("ADD_EDGE   "+from+"   -->   "+to+" upon "+getTokenName(t));
 		}
+		listenStayAtDFAState(to);
 
 		synchronized (from) {
 			if ( from.edges==null ) {

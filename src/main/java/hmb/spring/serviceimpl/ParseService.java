@@ -138,6 +138,12 @@ public class ParseService {
                     .build();
             mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
         });
+        atnSimulator.setStayAtDFAStateListener(dfaState -> {
+            var operation = StayAtDFAStateOperation.newBuilder()
+                    .setDfaState(OperationCreator.makeDFAState(dfaState, mapper))
+                    .build();
+            mainResponseBuilder.addOperation(OperationCreator.makeOperation(operation));
+        });
     }
 
     private static void addListeners(Parser parser, MainResponse.Builder mainResponseBuilder, ToTreeNodeUtils toTreeNodeUtils) {

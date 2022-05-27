@@ -93,6 +93,13 @@ public abstract class OperationCreator {
                 .build();
     }
 
+    public static OperationWrapper makeOperation(StayAtDFAStateOperation operation) {
+        return OperationWrapper.newBuilder()
+                .setOperationType(OperationType.StayAtDFAState)
+                .setStayAtDFAStateOperation(operation)
+                .build();
+    }
+
     private static AtnStateMsg makeATNState(ATNConfig config, Map<ATNState, ATNState> mapper) {
         return AtnStateMsg.newBuilder()
                 .setAtnStateNumber(mapper.getOrDefault(config.state, config.state).stateNumber)

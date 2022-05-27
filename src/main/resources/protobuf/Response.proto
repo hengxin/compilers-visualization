@@ -143,6 +143,7 @@ enum OperationType {
   ConsumeToken = 10;
   EditTree = 11;
   EndAdaptive = 12;
+  StayAtDFAState = 13;
 }
 
 message OperationWrapper {
@@ -158,6 +159,7 @@ message OperationWrapper {
   optional ConsumeTokenOperation consumeTokenOperation = 10;
   optional EditTreeOperation editTreeOperation = 11;
   optional EndAdaptiveOperation endAdaptiveOperation = 12;
+  optional StayAtDFAStateOperation stayAtDFAStateOperation = 13;
 }
 
 message StartStateClosureOperation {
@@ -200,6 +202,9 @@ message EditTreeOperation {
 }
 message EndAdaptiveOperation {  // 结束自适应预测算法
   required int32 alt = 1;
+}
+message StayAtDFAStateOperation {
+  required DFAStateMsg dfaState = 1;
 }
 //=============================== ⬆ operation ⬆ ===============================
 

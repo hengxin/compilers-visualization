@@ -128,7 +128,15 @@ public abstract class ATNSimulator {
 		}
 	}
 
-
+	private Consumer<DFAState> stayAtDFAStateListener = null;
+	public void setStayAtDFAStateListener(Consumer<DFAState> listener) {
+		this.stayAtDFAStateListener = listener;
+	}
+	protected void listenStayAtDFAState(DFAState dfa) {
+		if (stayAtDFAStateListener != null) {
+			stayAtDFAStateListener.accept(dfa);
+		}
+	}
 	/**
 	 * This is the current serialized UUID.
 	 * @deprecated Use {@link ATNDeserializer#checkCondition(boolean)} instead.
