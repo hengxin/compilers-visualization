@@ -10,7 +10,7 @@
     "build:demo": "vue-cli-service build",
     "docs": "node -r esm ./scripts/docs.js",
     "postinstall": "node ./scripts/postinstall.js",
-    "proto": "pbjs -t static-module -w commonjs -o src/gen/proto.js  protobuf/*.proto && pbts -o src/gen/proto.d.ts  src/gen/proto.js"
+    "proto": "mkdir -p src/gen/ && pbjs -t static-module -w commonjs -o src/gen/proto.js  protobuf/*.proto && pbts -o src/gen/proto.d.ts  src/gen/proto.js"
   },
   "main": "dist/index.cjs.min.js",
   "module": "dist/index.esm.min.js",
