@@ -1,0 +1,230 @@
+syntax = "proto2";
+package hmb.protobuf;
+
+
+//=============================== ⬇  ATN  ⬇ ===============================
+
+message ItemStyle {
+  optional string color = 1 [default = 'rgb(0,0,255)'];
+}
+
+message AtnNode {
+  required string id = 1;  // 为了方便以及减少出错，约定id为stateNumber
+  required string name = 2;
+  required int32 x = 3;
+  required int32 y = 4;
+  required bool fixed = 5; // default false
+  required ItemStyle itemStyle = 6;
+}
+
+message Label {
+  required bool show = 1 [default = true]; // always true
+  optional string formatter = 2; // string of line
+  required int32 lineHeight = 3 [default = -20]; // always -20
+}
+
+message LineStyle {
+  optional double curveness = 1 [default = 0];  // 前端已经全局设置 autoCurveness: true
+  optional string color = 2;
+}
+
+message AtnLink {
+  required string name = 1;
+  required string source = 2;  // node可能重名，下标好麻烦，因此使用唯一标识stateNumber
+  required string target = 3;  // node可能重名，下标好麻烦，因此使用唯一标识stateNumber
+  required Label label = 4;
+  required LineStyle lineStyle =5;
+}
+
+message SubAugmentedTransitionNetwork {
+  repeated AtnNode graphNode = 1;  // atnNode, data
+  repeated AtnLink graphEdge = 2;  // atnLink, links
+  required string ruleName = 3;
+}
+
+message AugmentedTransitionNetworks {
+  repeated SubAugmentedTransitionNetwork subATN = 2;
+}
+
+message InitialState {
+  required AugmentedTransitionNetworks lexerATN = 1;
+  required AugmentedTransitionNetworks parserATN = 2;
+}
+
+//=============================== ⬆  ATN  ⬆ ===============================
+
+
+
+
+
+
+//=============================== ⬇ lexer ⬇ ===============================
+
+message LexerState{
+}
+
+message LexerResult {
+  repeated LexerState lexerState = 1;
+}
+
+//=============================== ⬆ lexer ⬆ ===============================
+
+
+
+
+
+
+//=============================== ⬇ parser ⬇ ===============================
+
+message TreeNode{
+  required string name = 1;
+  repeated TreeNode children = 2;
+  required ItemStyle itemStyle = 3;
+  optional string val = 4;  // for toolTip
+}
+
+message ParserState{
+  required TreeNode root = 1;
+}
+
+message ParserResult {
+  repeated ParserState parserState = 1;
+}
+
+//=============================== ⬆ parser ⬆ ===============================
+
+
+
+
+
+//=============================== ⬇ ANTLR4Message ⬇ ===============================
+
+message AtnStateMsg {
+  required int32 atnStateNumber = 1;
+  required string context = 2;
+  // more...
+}
+
+message PairAtnStateMsg {
+  required AtnStateMsg first = 1;
+  required AtnStateMsg second = 2;
+}
+
+message DFAStateMsg {
+  repeated AtnStateMsg atnState = 1;  // 多个ATNConfig构成的一个整体状态，称为DFAState
+  optional int32 dfaStateNumber = 2 [default = -1];
+}
+
+message EdgeMsg {
+  required DFAStateMsg from = 1;
+  required DFAStateMsg to = 2;
+  required string upon = 3;
+}
+
+//=============================== ⬆ ANTLR4Message ⬆ ===============================
+
+
+
+
+
+
+//=============================== ⬇ operation ⬇ ===============================
+
+enum OperationType {
+  Error = 0;
+  StartStateClosure = 2;
+  ReachImmediate = 3;
+  StartCalEpsilonClosure = 4;
+  CalEpsilonClosureFinish = 5;
+  ReachDFAState = 6;
+  AddNewEdge = 7;
+  ReuseEdge = 8;
+  StartAdaptive = 9;
+  ConsumeToken = 10;
+  EditTree = 11;
+  EndAdaptive = 12;
+  StayAtDFAState = 13;
+}
+
+message OperationWrapper {
+  required OperationType operationType = 1;
+  optional StartStateClosureOperation startStateClosureOperation = 2;
+  optional ReachImmediateOperation reachImmediateOperation = 3;
+  optional StartCalEpsilonClosureOperation startCalEpsilonClosureOperation = 4;
+  optional CalEpsilonClosureFinishOperation calEpsilonClosureFinishOperation = 5;
+  optional ReachDFAStateOperation reachDFAStateOperation = 6;
+  optional AddNewEdgeOperation addNewEdgeOperation = 7;
+  optional ReuseEdgeOperation reuseEdgeOperation = 8;
+  optional StartAdaptiveOperation startAdaptiveOperation = 9;
+  optional ConsumeTokenOperation consumeTokenOperation = 10;
+  optional EditTreeOperation editTreeOperation = 11;
+  optional EndAdaptiveOperation endAdaptiveOperation = 12;
+  optional StayAtDFAStateOperation stayAtDFAStateOperation = 13;
+}
+
+message StartStateClosureOperation {
+  required DFAStateMsg startingClosure = 1;
+}
+message ReachImmediateOperation {
+  repeated AtnStateMsg reached = 1;
+  required bool isUnique = 2;
+}
+message StartCalEpsilonClosureOperation {
+  repeated AtnStateMsg start = 1;
+}
+message CalEpsilonClosureFinishOperation {
+  repeated PairAtnStateMsg epsilonEdge = 1;
+}
+message ReachDFAStateOperation {
+  required DFAStateMsg dfaState = 1;
+  required bool isNew = 2;  // 可能抵达了某一条边，但之前已经进入过。这时候map.put是一个空操作
+}
+message AddNewEdgeOperation {
+  required EdgeMsg newEdge = 1;
+}
+message ReuseEdgeOperation {
+  required EdgeMsg reuse = 1;
+}
+message StartAdaptiveOperation {  // 开始自适应预测算法，需要切换表格
+  repeated DFAStateMsg dfaStates = 1;
+  repeated EdgeMsg edges = 2;
+  required AtnStateMsg startAtn = 3;
+  required int32 decision = 4;
+}
+message ConsumeTokenOperation {
+  required TokenMsg tokenConsumed = 1;
+  required ParserState parserState = 2;  // Parser: consume token 过后必定会触发 visitTerminalNode
+}
+message EditTreeOperation {
+  required ParserState parserState = 1;
+  required string type = 2;  // 供前端打印，主要是push和pop
+  required string currentNode = 3;  // 当前位于哪个位置。因为栈顶都是非终结符，因此ConsumeToken时不需使用此条件
+}
+message EndAdaptiveOperation {  // 结束自适应预测算法
+  required int32 alt = 1;
+}
+message StayAtDFAStateOperation {
+  required DFAStateMsg dfaState = 1;
+}
+//=============================== ⬆ operation ⬆ ===============================
+
+
+//=============================== ⬇ tokenStream ⬇ ===============================
+
+message TokenMsg {
+  required int32 tokenType = 1;
+  required string tokenText = 2;
+  required string tokenRule = 3;
+  required int32 channel = 4;
+  optional string background = 5;
+}
+
+//=============================== ⬆ tokenStream ⬆ ===============================
+
+message MainResponse {
+  required bool success = 1;
+  optional InitialState initialState = 2;
+  optional string errorMessage = 3;
+  repeated OperationWrapper operation = 4;
+  repeated TokenMsg token = 5;
+}

@@ -1,0 +1,11 @@
+syntax = "proto3";
+package hmb.protobuf;
+
+message MainRequest {
+  sint32 userId = 1;
+  string name = 2;
+  string lexer = 3;
+  string parser = 4;
+  string code = 5;
+  string startRule = 6;
+}
