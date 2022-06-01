@@ -1,2 +1,0 @@
-# compilers-visualization
-Visualizing Compilers
